@@ -9,7 +9,6 @@ package main
  */
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -41,7 +40,7 @@ func NewToken(key, val string) Token {
 
 
 
-func Parse(code string) string {
+func Parse(code string) *Tokens {
 	tokens := strings.Split(code, " ")
   list := new(Tokens)
 
@@ -74,9 +73,7 @@ func Parse(code string) string {
 		}
 	}
 
-	fmt.Println(list)
-
-	return "abc"
+	return list
 }
 
 /*
