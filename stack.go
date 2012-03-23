@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 /*
  Synopsis:
@@ -42,6 +45,17 @@ func (k *Stack) pop() interface{} {
 	s := (*k)[last]
 	*k = (*k)[:last]
 	return s
+}
+
+func (k *Stack) popString() string {
+	p := k.pop()
+
+	if s, ok := p.(string); ok {
+		return s
+	} else if i, ok := p.(int); ok {
+		return strconv.Itob(i, 10)
+	}
+	return "nil"
 }
 
 func (k *Stack) top() interface{} {
