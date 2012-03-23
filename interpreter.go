@@ -9,17 +9,64 @@ import (
 func BootedTable() *Table {
 	tbl := NewTable()
 
-	tbl.define("add", func(s *Stack) *Stack {
-		add := s.pop().(int) + s.pop().(int)
-		s.push(add)
-		return s
-	})
+	t := map[string] Function {
 
-	tbl.define("prod", func(s *Stack) *Stack {
-		prod := s.pop().(int) * s.pop().(int)
-		s.push(prod)
-		return s
-	})
+		// Type conversion
+
+		"string": func(s *Stack) *Stack {
+			s.push(s.popString())
+			return s
+		},
+
+		// Basic I/O
+
+		"print": func(s *Stack) *Stack {
+			fmt.Println(s.popString())
+			return s
+		},
+
+		// Stack operations
+
+		"pop": func(s *Stack) *Stack {
+			s.pop()
+			return s
+		},
+		"size": func(s *Stack) *Stack {
+			s.push(s.size())
+			return s
+		},
+		"dup": func(s *Stack) *Stack {
+			s.push(s.top())
+			return s
+		},
+		"swap": func(s *Stack) *Stack {
+			a := s.pop()
+			b := s.pop()
+			s.push(b)
+			s.push(a)
+			return s
+		},
+		"drop": func(s *Stack) *Stack {
+			s.clear()
+			return s
+		},
+
+		// Arithmetic operations
+
+		"add": func(s *Stack) *Stack {
+			add := s.pop().(int) + s.pop().(int)
+			s.push(add)
+			return s
+		},
+		"prod": func(s *Stack) *Stack {
+			prod := s.pop().(int) * s.pop().(int)
+			s.push(prod)
+			return s
+		},
+
+	}
+
+	tbl.functions = t
 
 	tbl.alias("+", "add")
 	tbl.alias("*", "prod")
@@ -28,19 +75,8 @@ func BootedTable() *Table {
 }
 
 
-func BareEval(code string) (s *Stack, t *Table) {
-	tokens := Parse(code)
-	return BareRun(tokens)
-}
-
 func Eval(code string, stk *Stack, tbl *Table) (s *Stack, t *Table) {
 	tokens := Parse(code)
-	return Run(tokens, stk, tbl)
-}
-
-func BareRun(tokens *Tokens) (s *Stack, t *Table) {
-	stk := NewStack()
-	tbl := BootedTable()
 	return Run(tokens, stk, tbl)
 }
 
