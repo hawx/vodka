@@ -10,6 +10,7 @@ package main
 
 import (
 	"strings"
+	"regexp"
 )
 
 type Tokens []Token
@@ -39,15 +40,20 @@ func NewToken(key, val string) Token {
 }
 
 
-
 func Parse(code string) *Tokens {
 	tokens := strings.Split(code, " ")
   list := new(Tokens)
 
+	// Define some regular expressions
+	integerv, _ := regexp.Compile("[0-9]+")
+
 	for i := 0; i < len(tokens); i++ {
 		tok := tokens[i]
 
-		if strings.HasPrefix(tok, "'") {
+		if integerv.MatchString(tok) {
+			*list = append(*list, NewToken("int", tok))
+
+		} else if strings.HasPrefix(tok, "'") {
 			idx, found := parseString(tokens, "'", i)
 			i = idx
 			*list = append(*list, NewToken("str", found))
