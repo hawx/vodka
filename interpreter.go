@@ -29,6 +29,35 @@ func VNil() *VNilType {
 	return r
 }
 
+// BOOLEAN ---------------------------------------------
+
+type VBoolean struct {
+	value bool
+}
+
+func (v *VBoolean) String() string {
+	if v.value {
+		return "true"
+	}
+	return "false"
+}
+
+func (v *VBoolean) Value() interface{} {
+	return v.value
+}
+
+func VTrue() *VBoolean {
+	b := new(VBoolean)
+	b.value = true
+	return b
+}
+
+func VFalse() *VBoolean {
+	b := new(VBoolean)
+	b.value = false
+	return b
+}
+
 // STRING ---------------------------------------------
 
 type VString struct {
@@ -120,6 +149,15 @@ func BootedTable() *Table {
 			s.push(a)
 			return a
 		},
+		"swapp": func(s *Stack) VType {
+			a := s.pop()
+			b := s.pop()
+			c := s.pop()
+			s.push(b)
+			s.push(a)
+			s.push(c)
+			return c
+		},
 		"drop": func(s *Stack) VType {
 			s.clear()
 			return VNil()
@@ -136,6 +174,61 @@ func BootedTable() *Table {
 			prod := NewVIntegerInt(s.pop().Value().(int) * s.pop().Value().(int))
 			s.push(prod)
 			return prod
+		},
+		"sub": func(s *Stack) VType {
+			sub := NewVIntegerInt(s.pop().Value().(int) - s.pop().Value().(int))
+			s.push(sub)
+			return sub
+		},
+		"div": func(s *Stack) VType {
+			div := NewVIntegerInt(s.pop().Value().(int) / s.pop().Value().(int))
+			s.push(div)
+			return div
+		},
+
+		// Logical
+
+		"true": func(s *Stack) VType {
+			s.push(VTrue())
+			return VNil()
+		},
+		"false": func(s *Stack) VType {
+			s.push(VFalse())
+			return VNil()
+		},
+		"nil": func(s *Stack) VType {
+			s.push(VNil())
+			return VNil()
+		},
+
+		"or": func(s *Stack) VType {
+			a := s.pop().Value().(bool)
+			b := s.pop().Value().(bool)
+			val := VFalse()
+			if a || b {
+				val = VTrue()
+			}
+			s.push(val)
+			return VNil()
+		},
+		"and": func(s *Stack) VType {
+			a := s.pop().Value().(bool)
+			b := s.pop().Value().(bool)
+			val := VFalse()
+			if a && b {
+				val = VTrue()
+			}
+			s.push(val)
+			return VNil()
+		},
+		"not": func(s *Stack) VType {
+			a := s.pop().Value().(bool)
+			val := VTrue()
+			if a {
+				val = VFalse()
+			}
+			s.push(val)
+			return VNil()
 		},
 
 	}
