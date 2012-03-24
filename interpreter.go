@@ -5,9 +5,31 @@ import (
 	"strconv"
 )
 
+// TYPES --------------------------------------------
+
 type VType interface {
 	String()  string
+	Value()   interface{}
 }
+
+// SPECIALS ---------------------------------------------
+
+type VNilType struct { }
+
+func (v *VNilType) String() string {
+	return "nil"
+}
+
+func (v *VNilType) Value() interface{} {
+	return nil
+}
+
+func VNil() *VNilType {
+	r := new(VNilType)
+	return r
+}
+
+// STRING ---------------------------------------------
 
 type VString struct {
 	value string
@@ -17,6 +39,18 @@ func (v *VString) String() string {
 	return v.value
 }
 
+func (v *VString) Value() interface{} {
+	return v.value
+}
+
+func NewVString(s string) *VString {
+	r := new(VString)
+	r.value = s
+	return r
+}
+
+// Integer ------------------------------------------------
+
 type VInteger struct {
 	value int
 }
@@ -24,6 +58,23 @@ type VInteger struct {
 func (v *VInteger) String() string {
 	return strconv.Itob(v.value, 10)
 }
+
+func (v *VInteger) Value() interface{} {
+	return v.value
+}
+
+func NewVInteger(s string) *VInteger {
+	r := new(VInteger)
+	r.value, _ = strconv.Atoi(s)
+	return r
+}
+
+func NewVIntegerInt(i int) *VInteger {
+	r := new(VInteger)
+	r.value = i
+	return r
+}
+
 
 func BootedTable() *Table {
 	tbl := NewTable()
