@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
 /*
@@ -23,7 +22,7 @@ import (
  fmt.Println(stk.String())
  //=> []
  */
-type Stack []interface{}
+type Stack []VType
 
 func (k *Stack) size() int {
 	return len(*k)
@@ -33,11 +32,11 @@ func (k *Stack) empty() bool {
 	return len(*k) == 0
 }
 
-func (k *Stack) push(s interface{}) {
+func (k *Stack) push(s VType) {
 	*k = append(*k, s)
 }
 
-func (k *Stack) pop() interface{} {
+func (k *Stack) pop() VType {
 	if k.empty() {
 		return nil
 	}
@@ -47,18 +46,11 @@ func (k *Stack) pop() interface{} {
 	return s
 }
 
-func (k *Stack) popString() string {
-	p := k.pop()
-
-	if s, ok := p.(string); ok {
-		return s
-	} else if i, ok := p.(int); ok {
-		return strconv.Itob(i, 10)
-	}
-	return "nil"
+func (k *Stack) popString() *VString {
+	return NewVString(k.pop().String())
 }
 
-func (k *Stack) top() interface{} {
+func (k *Stack) top() VType {
 	if k.empty() {
 		return nil
 	}

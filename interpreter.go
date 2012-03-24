@@ -83,55 +83,59 @@ func BootedTable() *Table {
 
 		// Type conversion
 
-		"string": func(s *Stack) *Stack {
-			s.push(s.popString())
-			return s
+		"string": func(s *Stack) VType {
+			v := s.popString()
+			s.push(v)
+			return v
 		},
 
 		// Basic I/O
 
-		"print": func(s *Stack) *Stack {
-			fmt.Println(s.popString())
-			return s
+		"print": func(s *Stack) VType {
+			v := s.popString()
+			fmt.Println()
+			return v
 		},
 
 		// Stack operations
 
-		"pop": func(s *Stack) *Stack {
-			s.pop()
-			return s
+		"pop": func(s *Stack) VType {
+			v := s.pop()
+			return v
 		},
-		"size": func(s *Stack) *Stack {
-			s.push(s.size())
-			return s
+		"size": func(s *Stack) VType {
+			v := NewVIntegerInt(s.size())
+			s.push(v)
+			return v
 		},
-		"dup": func(s *Stack) *Stack {
-			s.push(s.top())
-			return s
+		"dup": func(s *Stack) VType {
+			v := s.top()
+			s.push(v)
+			return v
 		},
-		"swap": func(s *Stack) *Stack {
+		"swap": func(s *Stack) VType {
 			a := s.pop()
 			b := s.pop()
 			s.push(b)
 			s.push(a)
-			return s
+			return a
 		},
-		"drop": func(s *Stack) *Stack {
+		"drop": func(s *Stack) VType {
 			s.clear()
-			return s
+			return VNil()
 		},
 
 		// Arithmetic operations
 
-		"add": func(s *Stack) *Stack {
-			add := s.pop().(int) + s.pop().(int)
+		"add": func(s *Stack) VType {
+			add := NewVIntegerInt(s.pop().Value().(int) + s.pop().Value().(int))
 			s.push(add)
-			return s
+			return add
 		},
-		"prod": func(s *Stack) *Stack {
-			prod := s.pop().(int) * s.pop().(int)
+		"prod": func(s *Stack) VType {
+			prod := NewVIntegerInt(s.pop().Value().(int) * s.pop().Value().(int))
 			s.push(prod)
-			return s
+			return prod
 		},
 
 	}
@@ -145,21 +149,21 @@ func BootedTable() *Table {
 }
 
 
-func Eval(code string, stk *Stack, tbl *Table) (s *Stack, t *Table) {
+func Eval(code string, stk *Stack, tbl *Table) (s *Stack, t *Table, v string) {
 	tokens := Parse(code)
 	return Run(tokens, stk, tbl)
 }
 
-func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table) {
+func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v string) {
+	var val VType = VNil()
 
 	for _, tok := range *tokens {
 		switch tok.key {
 		case "str":
-			stk.push(tok.val)
+			stk.push(NewVInteger(tok.val))
 
 		case "int":
-			i, _ := strconv.Atoi(tok.val)
-			stk.push(i)
+			stk.push(NewVInteger(tok.val))
 
 		case "stm":
 			// add statements to stack
@@ -167,7 +171,7 @@ func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table) {
 		case "fun":
 			if tbl.has(tok.val) {
 				f := tbl.get(tok.val)
-				stk = f(stk)
+				val = f(stk)
 			} else {
 				// no function error!
 			}
@@ -178,7 +182,10 @@ func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table) {
 		}
 	}
 
-	fmt.Println(stk.String())
+	// If no value has been set show stack
+	if val.Value() == nil {
+		val = NewVString(stk.String())
+	}
 
-	return stk, tbl
+	return stk, tbl, val.String()
 }

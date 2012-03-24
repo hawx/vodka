@@ -34,7 +34,8 @@ func main() {
 			break
 		}
 
-		stk, tbl = Eval(line, stk, tbl)
-		fmt.Printf("=> %s\n", stk.String())
+		e := ""
+		stk, tbl, e = Eval(line, stk, tbl)
+		fmt.Printf("=> %s\n", e)
 	}
 }
