@@ -5,6 +5,25 @@ import (
 	"strconv"
 )
 
+type VType interface {
+	String()  string
+}
+
+type VString struct {
+	value string
+}
+
+func (v *VString) String() string {
+	return v.value
+}
+
+type VInteger struct {
+	value int
+}
+
+func (v *VInteger) String() string {
+	return strconv.Itob(v.value, 10)
+}
 
 func BootedTable() *Table {
 	tbl := NewTable()
