@@ -122,7 +122,7 @@ func BootedTable() *Table {
 
 		"print": func(s *Stack) VType {
 			v := s.popString()
-			fmt.Println()
+			fmt.Println(v.String())
 			return v
 		},
 
@@ -241,6 +241,11 @@ func BootedTable() *Table {
 	return tbl
 }
 
+
+func BareEval(code string) {
+	tokens := Parse(code)
+	Run(tokens, NewStack(), BootedTable())
+}
 
 func Eval(code string, stk *Stack, tbl *Table) (s *Stack, t *Table, v string) {
 	tokens := Parse(code)

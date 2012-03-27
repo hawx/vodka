@@ -46,6 +46,7 @@ func Parse(code string) *Tokens {
 
 	// Define some regular expressions
 	integerv, _ := regexp.Compile("[0-9]+")
+	fun, _ := regexp.Compile(".+")
 
 	for i := 0; i < len(tokens); i++ {
 		tok := tokens[i]
@@ -74,8 +75,8 @@ func Parse(code string) *Tokens {
 			i = idx
 			*list = append(*list, NewToken("stm", found))
 
-		} else {
-			*list = append(*list, NewToken("fun", tok))
+		} else if fun.MatchString(tok) {
+			*list = append(*list, NewToken("fun", strings.TrimSpace(tok)))
 		}
 	}
 

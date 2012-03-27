@@ -83,7 +83,8 @@ func (k Stack) String() string {
 }
 
 func (k Stack) TruncatedString() string {
-	lim := 7	str := "... "
+	lim := 7
+	str := "... "
 	if k.size() < lim {
 		str = "["
 	}

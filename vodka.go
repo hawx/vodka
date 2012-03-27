@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"fmt"
 	"os"
 	"bufio"
@@ -22,20 +23,26 @@ func promptLine(prompt string) string {
 }
 
 func main() {
-	fmt.Println("Vodka REPL, CTRL+C or type 'quit' to quit")
+	if len(os.Args) == 2 {
+		contents, _ := ioutil.ReadFile(os.Args[1])
+		BareEval(string(contents))
 
-	stk := NewStack()
-	tbl := BootedTable()
+	} else {
+		fmt.Println("Vodka REPL, CTRL+C or type 'quit' to quit")
+		stk := NewStack()
+		tbl := BootedTable()
 
-	for {
-		line := promptLine(">> ")
 
-		if line == "quit" {
-			break
+		for {
+			line := promptLine(">> ")
+
+			if line == "quit" {
+				break
+			}
+
+			e := ""
+			stk, tbl, e = Eval(line, stk, tbl)
+			fmt.Printf("%s => %s\n", stk.TruncatedString(), e)
 		}
-
-		e := ""
-		stk, tbl, e = Eval(line, stk, tbl)
-		fmt.Printf("%s => %s\n", stk.TruncatedString(), e)
 	}
 }
