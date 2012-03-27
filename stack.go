@@ -59,6 +59,15 @@ func (k *Stack) top() VType {
 	return s
 }
 
+func (k *Stack) peek(n int) []VType {
+	if k.size() <= n {
+		return *k
+	}
+	last := len(*k)
+	s := (*k)[last-n:last]
+	return s
+}
+
 func (k *Stack) clear() {
 	*k = (*k)[0:0]
 }
@@ -68,6 +77,20 @@ func (k Stack) String() string {
 	for i, elem := range k {
 		if i > 0 {
 			str += ", "
+		}
+		str += fmt.Sprint(elem)
+	}
+	return str + "]"
+}
+
+func (k Stack) TruncatedString() string {
+	lim := 7	str := "... "
+	if k.size() < lim {
+		str = "["
+	}
+	for i, elem := range k.peek(lim) {
+		if i > 0 {
+			str += " "
 		}
 		str += fmt.Sprint(elem)
 	}

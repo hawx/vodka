@@ -277,7 +277,7 @@ func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v string) 
 
 	// If no value has been set show stack
 	if val.Value() == nil {
-		val = NewVString(stk.String())
+		val = VNil()
 	}
 
 	return stk, tbl, val.String()

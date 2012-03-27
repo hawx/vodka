@@ -36,6 +36,6 @@ func main() {
 
 		e := ""
 		stk, tbl, e = Eval(line, stk, tbl)
-		fmt.Printf("=> %s\n", e)
+		fmt.Printf("%s => %s\n", stk.TruncatedString(), e)
 	}
 }
