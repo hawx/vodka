@@ -4,24 +4,23 @@ import (
 	"fmt"
 )
 
-/*
- Synopsis:
+// Synopsis:
+//
+//   stk := NewStack()
+//   stk.push(1)
+//   stk.push(2)
+//   stk.push(3)
+//   fmt.Println(stk.String())
+//   ;=> [1 2 3]
+//
+//   stk.pop()
+//   fmt.Println(stk.String())
+//   ;=> [1 2]
+//
+//   stk.clear()
+//   fmt.Println(stk.String())
+//   ;=> []
 
- stk := NewStack()
- stk.push(1)
- stk.push(2)
- stk.push(3)
- fmt.Println(stk.String())
- //=> [1 2 3]
-
- stk.pop()
- fmt.Println(stk.String())
- //=> [1 2]
-
- stk.clear()
- fmt.Println(stk.String())
- //=> []
- */
 type Stack []VType
 
 func (k *Stack) size() int {

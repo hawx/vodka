@@ -1,12 +1,12 @@
 package main
 
-/*
- Synopsis:
 
- Parse("1 2 + 'Hello World' [ '!' append ] 5 times")
- //=> [[fun: 1] [fun: 2] [fun: +] [str: 'Hello World'] [stm: '!' append]
-       [fun: 5] [fun: times]]
- */
+// Synopsis:
+//
+//   Parse("1 2 + 'Hello World' [ '!' append ] 5 times")
+//   ;=> [[fun: 1] [fun: 2] [fun: +] [str: 'Hello World'] [stm: '!' append]
+//         [fun: 5] [fun: times]]
+
 
 import (
 	"strings"
@@ -82,10 +82,9 @@ func Parse(code string) *Tokens {
 	return list
 }
 
-/*
- Parses until a token ending in +until+ is found, returning what has been found
- as a string.
- */
+
+// Parses until a token ending in +until+ is found, returning what has been found
+// as a string.
 func parseString(tokens []string, until string, idx int) (i int, str string) {
 	str = ""
 	for i := idx; i < len(tokens); i++ {
@@ -98,9 +97,8 @@ func parseString(tokens []string, until string, idx int) (i int, str string) {
 	return len(tokens), strings.TrimSpace(str)
 }
 
-/*
- Parses a block, some tokens surrounded by square brackets.
- */
+
+// Parses a block, some tokens surrounded by square brackets.
 func parseBlock(tokens []string, idx int) (i int, str string) {
 	str = ""
 	for i := idx; i < len(tokens); i++ {
