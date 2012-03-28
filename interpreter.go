@@ -321,6 +321,15 @@ func BootedTable() *Table {
 			Run(a, s, t)
 			return VNil()
 		},
+		"times": func(s *Stack, t *Table) VType {
+			n := s.pop().Value().(int)
+			f := s.pop().Value().(*Tokens)
+			for i := 0; i < n; i++ {
+				s, t, _ = Run(f, s, t)
+			}
+			return VNil()
+		},
+
 	}
 
 	tbl.functions = t
