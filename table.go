@@ -1,6 +1,6 @@
 package main
 
-type Function func(*Stack) VType
+type Function func(*Stack, *Table) VType
 type Table struct {
 	functions map[string] Function
 	aliases   map[string] string

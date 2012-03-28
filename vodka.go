@@ -32,7 +32,6 @@ func main() {
 		stk := NewStack()
 		tbl := BootedTable()
 
-
 		for {
 			line := promptLine(">> ")
 
@@ -40,9 +39,9 @@ func main() {
 				break
 			}
 
-			e := ""
+			var e VType = VNil()
 			stk, tbl, e = Eval(line, stk, tbl)
-			fmt.Printf("%s => %s\n", stk.TruncatedString(), e)
+			fmt.Printf("%s => %s\n", stk.TruncatedString(), e.String())
 		}
 	}
 }
