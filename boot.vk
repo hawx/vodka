@@ -1,0 +1,35 @@
+'add'  '+' alias
+'prod' '*' alias
+'sub'  '-' alias
+'div'  '/' alias
+'mod'  '%' alias
+
+'eq?'  '=' alias
+'gt?'  '>' alias
+'lt?'  '<' alias
+'not'  '!' alias
+
+'inc' [ 1 add ] define
+'dec' [ 1 sub ] define
+
+'inc' '++' alias
+'dec' '--' alias
+
+'lte?' [
+  gt? !
+] define
+
+'gte?' [
+  lt? !
+] define
+
+'lte?' '<=' alias
+'gte?' '>=' alias
+
+'empty?' [
+  size 0 eq?
+] define
+
+'small?' [
+  size 1 lte?
+]
