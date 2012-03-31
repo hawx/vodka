@@ -2,40 +2,62 @@ package main
 
 type Function func(*Stack, *Table) VType
 type Table struct {
+	native    map[string] Tokens
 	functions map[string] Function
 	aliases   map[string] string
 }
 
-func (t *Table) get(name string) Function {
-	if t.has(name) {
-		f, fp := t.functions[name]
-		if fp {
-			return f
-		} else {
-			a, _ := t.aliases[name]
-			return t.functions[a]
-		}
+func (t *Table) String() string {
+	s := "Native:\n"
+	for i, ts := range t.native {
+		s += "  " + i + " " + ts.String() + "\n"
 	}
-	return nil
+
+	s += "\nFunctions:\n"
+	for i, _ := range t.functions {
+		s += "  " + i
+	}
+
+	return s + "\n"
+}
+
+func (t *Table) call(name string, s *Stack) VType {
+	var e VType = VNil()
+	if n, np := t.native[name]; np {
+		_, _, e = Run(&n, s, t)
+	} else if f, fp := t.functions[name]; fp {
+		e = f(s, t)
+	} else {
+		a, _ := t.aliases[name]
+		return t.call(a, s)
+	}
+	return e
 }
 
 func (t *Table) has(name string) bool {
+	_, n := t.native[name]
 	_, f := t.functions[name]
 	_, a := t.aliases[name]
-	return f || a
+	return n || f || a
 }
 
 func (t *Table) define(name string, f Function) {
 	t.functions[name] = f
 }
 
+func (t *Table) defineNative(name string, ts *Tokens) {
+	t.native[name[1:len(name)-2]] = *ts
+}
+
 func (t *Table) alias(from, to string) {
 	t.aliases[from] = to
 }
 
-
 func NewTable() *Table {
 	tbl := new(Table)
+
+	n := map[string] Tokens { }
+	tbl.native = n
 
 	f := map[string] Function { }
 	tbl.functions = f

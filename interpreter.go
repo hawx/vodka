@@ -330,6 +330,19 @@ func BootedTable() *Table {
 			return VNil()
 		},
 
+		// Definition
+
+		"alias": func(s *Stack, t *Table) VType {
+			t.alias(s.pop().Value().(string), s.pop().Value().(string))
+			return VNil()
+		},
+		"define": func(s *Stack, t *Table) VType {
+			stms := s.pop().Value().(*Tokens)
+			name := s.pop().Value().(string)
+			t.defineNative(name, stms)
+			return VNil()
+		},
+
 	}
 
 	tbl.functions = t
@@ -338,6 +351,11 @@ func BootedTable() *Table {
 	tbl.alias("*", "prod")
 	tbl.alias("-", "sub")
 	tbl.alias("/", "div")
+
+	tbl.define("cool", func(s *Stack, t *Table) VType {
+		s.push(NewVString("cool"))
+		return VNil()
+	})
 
 	return tbl
 }
@@ -359,7 +377,7 @@ func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
 	for _, tok := range *tokens {
 		switch tok.key {
 		case "str":
-			stk.push(NewVInteger(tok.val))
+			stk.push(NewVString(tok.val))
 
 		case "int":
 			stk.push(NewVInteger(tok.val))
@@ -369,15 +387,13 @@ func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
 
 		case "fun":
 			if tbl.has(tok.val) {
-				f := tbl.get(tok.val)
-				val = f(stk, tbl)
+				val = tbl.call(tok.val, stk)
 			} else {
-				// no function error!
+				println("Unknown function: " + tok.val)
 			}
 
 		default:
-			// problem?
-
+			println("Unknown token: " + tok.String())
 		}
 	}
 
