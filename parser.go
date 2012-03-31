@@ -41,7 +41,8 @@ func NewToken(key, val string) Token {
 
 
 func Parse(code string) *Tokens {
-	tokens := strings.Split(code, " ")
+	tokens := strings.Fields(code)
+
   list := new(Tokens)
 
 	// Define some regular expressions

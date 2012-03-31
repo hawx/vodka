@@ -3,13 +3,16 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
+	"io/ioutil"
 )
 
 // TYPES --------------------------------------------
 
 type VType interface {
-	String()  string
-	Value()   interface{}
+	String()            string
+	Value()             interface{}
+	CompareWith(VType)  int
 }
 
 // SPECIALS ---------------------------------------------
@@ -22,6 +25,13 @@ func (v *VNilType) String() string {
 
 func (v *VNilType) Value() interface{} {
 	return nil
+}
+
+func (v *VNilType) CompareWith(other VType) int {
+	if _, same := (other).(*VNilType); same {
+		return 0
+	}
+	return -2
 }
 
 func VNil() *VNilType {
@@ -46,16 +56,27 @@ func (v *VBoolean) Value() interface{} {
 	return v.value
 }
 
-func VTrue() *VBoolean {
+func (v VBoolean) CompareWith(other VType) int {
+	if val, same := other.(*VBoolean); same {
+		if val.value == v.value {
+			return 0
+		}
+	}
+	return -2
+}
+
+func NewVBoolean(val bool) *VBoolean {
 	b := new(VBoolean)
-	b.value = true
+	b.value = val
 	return b
 }
 
+func VTrue() *VBoolean {
+	return NewVBoolean(true)
+}
+
 func VFalse() *VBoolean {
-	b := new(VBoolean)
-	b.value = false
-	return b
+	return NewVBoolean(false)
 }
 
 // TOKENS ---------------------------------------------
@@ -72,9 +93,18 @@ func (v *VTokens) Value() interface{} {
 	return Parse(v.value)
 }
 
+func (v *VTokens) CompareWith(other VType) int {
+	if val, same := other.(*VTokens); same {
+		if val.value == v.value {
+			return 0
+		}
+	}
+	return -2
+}
+
 func NewVTokens(s string) *VTokens {
 	r := new(VTokens)
-	r.value = s
+	r.value = strings.TrimSpace(s)
 	return r
 }
 
@@ -90,6 +120,19 @@ func (v *VString) String() string {
 
 func (v *VString) Value() interface{} {
 	return v.value
+}
+
+func (v *VString) CompareWith(other VType) int {
+	if val, same := other.(*VString); same {
+		if val.value == v.value {
+			return 0
+		} else if val.value < v.value {
+			return 1
+		} else {
+			return -1
+		}
+	}
+	return -2
 }
 
 func NewVString(s string) *VString {
@@ -110,6 +153,19 @@ func (v *VInteger) String() string {
 
 func (v *VInteger) Value() interface{} {
 	return v.value
+}
+
+func (v *VInteger) CompareWith(other VType) int {
+	if val, same := other.(*VInteger); same {
+		if val.value == v.value {
+			return 0
+		} else if val.value < v.value {
+			return 1
+		} else {
+			return -1
+		}
+	}
+	return -2
 }
 
 func NewVInteger(s string) *VInteger {
@@ -196,12 +252,16 @@ func BootedTable() *Table {
 			return prod
 		},
 		"sub": func(s *Stack, t *Table) VType {
-			sub := NewVIntegerInt(s.pop().Value().(int) - s.pop().Value().(int))
+			a := s.pop().Value().(int)
+			b := s.pop().Value().(int)
+			sub := NewVIntegerInt(b - a)
 			s.push(sub)
 			return sub
 		},
 		"div": func(s *Stack, t *Table) VType {
-			div := NewVIntegerInt(s.pop().Value().(int) / s.pop().Value().(int))
+			a := s.pop().Value().(int)
+			b := s.pop().Value().(int)
+			div := NewVIntegerInt(b / a)
 			s.push(div)
 			return div
 		},
@@ -252,29 +312,26 @@ func BootedTable() *Table {
 		},
 
 		"eq?": func(s *Stack, t *Table) VType {
-			val := VFalse()
-			if s.pop().Value() == s.pop().Value() {
-				val = VTrue()
-			}
+			a := s.pop()
+			b := s.pop()
+			val := NewVBoolean(a.CompareWith(b) == 0)
 			s.push(val)
 			return val
 		},
-		// "gt?": func(s *Stack, t *Table) VType {
-		// 	val := VFalse()
-		// 	if s.pop().Value() > s.pop().Value() {
-		// 		val = VTrue()
-		// 	}
-		// 	s.push(val)
-		// 	return val
-		// },
-		// "lt?": func(s *Stack, t *Table) VType {
-		// 	val := VFalse()
-		// 	if s.pop().Value() < s.pop().Value() {
-		// 		val = VTrue()
-		// 	}
-		// 	s.push(val)
-		// 	return val
-		// },
+		"gt?": func(s *Stack, t *Table) VType {
+			a := s.pop()
+			b := s.pop()
+			val := NewVBoolean(a.CompareWith(b) == 1)
+			s.push(val)
+			return val
+		},
+		"lt?": func(s *Stack, t *Table) VType {
+			a := s.pop()
+			b := s.pop()
+			val := NewVBoolean(a.CompareWith(b) == -1)
+			s.push(val)
+			return val
+		},
 
 		// Control flow
 
@@ -333,7 +390,9 @@ func BootedTable() *Table {
 		// Definition
 
 		"alias": func(s *Stack, t *Table) VType {
-			t.alias(s.pop().Value().(string), s.pop().Value().(string))
+			from := s.pop().Value().(string)
+			to := s.pop().Value().(string)
+			t.alias(from[1:len(from)-2], to[1:len(to)-2])
 			return VNil()
 		},
 		"define": func(s *Stack, t *Table) VType {
@@ -347,15 +406,8 @@ func BootedTable() *Table {
 
 	tbl.functions = t
 
-	tbl.alias("+", "add")
-	tbl.alias("*", "prod")
-	tbl.alias("-", "sub")
-	tbl.alias("/", "div")
-
-	tbl.define("cool", func(s *Stack, t *Table) VType {
-		s.push(NewVString("cool"))
-		return VNil()
-	})
+	contents, _ := ioutil.ReadFile("boot.vk")
+	_, tbl, _ = Eval(string(contents), NewStack(), tbl)
 
 	return tbl
 }
@@ -389,7 +441,7 @@ func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
 			if tbl.has(tok.val) {
 				val = tbl.call(tok.val, stk)
 			} else {
-				println("Unknown function: " + tok.val)
+				println("Unknown function: '" + tok.val + "'")
 			}
 
 		default:
