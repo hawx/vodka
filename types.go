@@ -84,7 +84,7 @@ type VTokens struct {
 }
 
 func (v *VTokens) String() string {
-	return "[" + v.value + "]"
+	return "tokens:[ " + v.value + " ]"
 }
 
 func (v *VTokens) Value() interface{} {
