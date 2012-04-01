@@ -1,8 +1,12 @@
 'add'  '+' alias
-'prod' '*' alias
+'mult' '*' alias
 'sub'  '-' alias
 'div'  '/' alias
 'mod'  '%' alias
+
+'gt?'  [ compare  1 eq? ] define
+'lt?'  [ compare -1 eq? ] define
+'neq?' [ compare -2 eq? ] define
 
 'eq?'  '=' alias
 'gt?'  '>' alias
@@ -32,4 +36,20 @@
 
 'small?' [
   size 1 lte?
-]
+] define
+
+'sum' [
+  :+ size 2 - times
+] define
+
+'prod' [
+  :* size 2 - times
+] define
+
+'if' [
+  . swap if-else
+] define
+
+'unless' [
+  swap not swap if
+] define

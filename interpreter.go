@@ -45,18 +45,18 @@ func BootedTable() *Table {
 		"swap": func(s *Stack, t *Table) VType {
 			a := s.pop()
 			b := s.pop()
-			s.push(b)
 			s.push(a)
-			return a
+			s.push(b)
+			return VNil()
 		},
 		"swapp": func(s *Stack, t *Table) VType {
 			a := s.pop()
 			b := s.pop()
 			c := s.pop()
 			s.push(b)
-			s.push(a)
 			s.push(c)
-			return c
+			s.push(a)
+			return VNil()
 		},
 		"drop": func(s *Stack, t *Table) VType {
 			s.clear()
@@ -70,10 +70,10 @@ func BootedTable() *Table {
 			s.push(add)
 			return add
 		},
-		"prod": func(s *Stack, t *Table) VType {
-			prod := NewVIntegerInt(s.pop().Value().(int) * s.pop().Value().(int))
-			s.push(prod)
-			return prod
+		"mult": func(s *Stack, t *Table) VType {
+			mult := NewVIntegerInt(s.pop().Value().(int) * s.pop().Value().(int))
+			s.push(mult)
+			return mult
 		},
 		"sub": func(s *Stack, t *Table) VType {
 			a := s.pop().Value().(int)
@@ -135,6 +135,13 @@ func BootedTable() *Table {
 			return VNil()
 		},
 
+		"compare": func(s *Stack, t *Table) VType {
+			a := s.pop()
+			b := s.pop()
+			val := NewVIntegerInt(a.CompareWith(b))
+			s.push(val)
+			return val
+		},
 		"eq?": func(s *Stack, t *Table) VType {
 			a := s.pop()
 			b := s.pop()
@@ -142,58 +149,17 @@ func BootedTable() *Table {
 			s.push(val)
 			return val
 		},
-		"gt?": func(s *Stack, t *Table) VType {
-			a := s.pop()
-			b := s.pop()
-			val := NewVBoolean(a.CompareWith(b) == 1)
-			s.push(val)
-			return val
-		},
-		"lt?": func(s *Stack, t *Table) VType {
-			a := s.pop()
-			b := s.pop()
-			val := NewVBoolean(a.CompareWith(b) == -1)
-			s.push(val)
-			return val
-		},
 
 		// Control flow
 
-		"if": func(s *Stack, t *Table) VType {
-			o := s.pop().Value().(*Tokens)
-			cond := s.pop()
-			if cond.Value().(bool) {
-				s, t, _ = Run(o, s, t)
-			}
-			return VNil()
-		},
-		"unless": func(s *Stack, t *Table) VType {
-			o := s.pop().Value().(*Tokens)
-			cond := s.pop().Value().(bool)
-			if cond {
-				s, t, _ = Run(o, s, t)
-			}
-			return VNil()
-		},
 		"if-else": func(s *Stack, t *Table) VType {
 			a := s.pop().Value().(*Tokens)
 			b := s.pop().Value().(*Tokens)
 			cond := s.pop().Value().(bool)
 			if cond {
-				s, t, _ = Run(b, s, t)
-			} else {
 				s, t, _ = Run(a, s, t)
-			}
-			return VNil()
-		},
-		"else-if": func(s *Stack, t *Table) VType {
-			b := s.pop().Value().(*Tokens)
-			a := s.pop().Value().(*Tokens)
-			cond := s.pop().Value().(bool)
-			if cond {
-				s, t, _ = Run(b, s, t)
 			} else {
-				s, t, _ = Run(a, s, t)
+				s, t, _ = Run(b, s, t)
 			}
 			return VNil()
 		},
