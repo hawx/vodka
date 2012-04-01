@@ -65,6 +65,9 @@ func Parse(code string) *Tokens {
 			i = idx
 			*list = append(*list, NewToken("str", found))
 
+		} else if strings.HasPrefix(tok, ":") {
+			*list = append(*list, NewToken("stm", tok[1:len(tok)]))
+
 		} else if strings.TrimSpace(tok) ==  "[" {
 			i++
 			idx, found := parseBlock(tokens, i)
@@ -106,13 +109,22 @@ func parseBlock(tokens []string, idx int) (i int, str string) {
 	for i := idx; i < len(tokens); i++ {
 		tok := tokens[i]
 
-		if strings.TrimSpace(tok) == "]" {
-			return i, str
-		}
+		if strings.HasPrefix(tok, "[") {
+			temp := ""
+			i++
+			i, temp = parseBlock(tokens, i)
+			i++
+			str += "[ " + temp + " ]"
+		} else {
 
-		str += tok + " "
-		if strings.HasSuffix(tok, "]") {
-			return i, str
+			if strings.TrimSpace(tok) == "]" {
+				return i, strings.TrimSpace(str)
+			}
+
+			str += tok + " "
+			if strings.HasSuffix(tok, "]") {
+				return i, strings.TrimSpace(str)
+			}
 		}
 	}
 	return len(tokens), strings.TrimSpace(str)
