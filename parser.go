@@ -52,7 +52,10 @@ func Parse(code string) *Tokens {
 	for i := 0; i < len(tokens); i++ {
 		tok := tokens[i]
 
-		if integerv.MatchString(tok) {
+		if tok == "." {
+			*list = append(*list, NewToken("stm", ""))
+
+		} else if integerv.MatchString(tok) {
 			*list = append(*list, NewToken("int", tok))
 
 		} else if strings.HasPrefix(tok, "'") {
