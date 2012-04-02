@@ -1,17 +1,20 @@
+; Stack operations
+
+'stack' [ size 2 - times ] define
+
 ; Arithmetic operations
 
 'add'  '+' alias
 'mult' '*' alias
 'sub'  '-' alias
 'div'  '/' alias
-'mod'  '%' alias
 
 'sum' [
-  :+ size 2 - times
+  :+ stack
 ] define
 
 'prod' [
-  :* size 2 - times
+  :* stack
 ] define
 
 'inc' [ 1 add ] define
@@ -22,6 +25,13 @@
 
 'zero?' [
   0 eq?
+] define
+
+'fact' [
+  dup zero?
+  [ dup dec fact mult ]
+  [ pop 1 ]
+  if-else
 ] define
 
 ; Logical operations
