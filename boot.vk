@@ -1,8 +1,31 @@
+; Arithmetic operations
+
 'add'  '+' alias
 'mult' '*' alias
 'sub'  '-' alias
 'div'  '/' alias
 'mod'  '%' alias
+
+'sum' [
+  :+ size 2 - times
+] define
+
+'prod' [
+  :* size 2 - times
+] define
+
+'inc' [ 1 add ] define
+'dec' [ 1 sub ] define
+
+'inc' '++' alias
+'dec' '--' alias
+
+
+; Logical operations
+
+'not' [
+  :true :false if-else
+] define
 
 'gt?'  [ compare  1 eq? ] define
 'lt?'  [ compare -1 eq? ] define
@@ -12,12 +35,6 @@
 'gt?'  '>' alias
 'lt?'  '<' alias
 'not'  '!' alias
-
-'inc' [ 1 add ] define
-'dec' [ 1 sub ] define
-
-'inc' '++' alias
-'dec' '--' alias
 
 'lte?' [
   gt? !
@@ -30,6 +47,9 @@
 'lte?' '<=' alias
 'gte?' '>=' alias
 
+
+; Reflection
+
 'empty?' [
   size 0 eq?
 ] define
@@ -38,13 +58,14 @@
   size 1 lte?
 ] define
 
-'sum' [
-  :+ size 2 - times
-] define
+'nil?'     [ type 'nil'     = ] define
+'boolean?' [ type 'boolean' = ] define
+'tokens?'  [ type 'tokens'  = ] define
+'string?'  [ type 'string'  = ] define
+'integer?' [ type 'integer' = ] define
 
-'prod' [
-  :* size 2 - times
-] define
+
+; Control flow
 
 'if' [
   . swap if-else

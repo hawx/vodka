@@ -10,6 +10,7 @@ import (
 type VType interface {
 	String()            string
 	Value()             interface{}
+	Type()              string
 	CompareWith(VType)  int
 }
 
@@ -23,6 +24,10 @@ func (v *VNilType) String() string {
 
 func (v *VNilType) Value() interface{} {
 	return nil
+}
+
+func (v *VNilType) Type() string {
+	return "nil"
 }
 
 func (v *VNilType) CompareWith(other VType) int {
@@ -52,6 +57,10 @@ func (v *VBoolean) String() string {
 
 func (v *VBoolean) Value() interface{} {
 	return v.value
+}
+
+func (v *VBoolean) Type() string {
+	return "boolean"
 }
 
 func (v VBoolean) CompareWith(other VType) int {
@@ -91,6 +100,10 @@ func (v *VTokens) Value() interface{} {
 	return Parse(v.value)
 }
 
+func (v *VTokens) Type() string {
+	return "tokens"
+}
+
 func (v *VTokens) CompareWith(other VType) int {
 	if val, same := other.(*VTokens); same {
 		if val.value == v.value {
@@ -113,11 +126,15 @@ type VString struct {
 }
 
 func (v *VString) String() string {
-	return v.value
+	return "'" + v.value + "'"
 }
 
 func (v *VString) Value() interface{} {
 	return v.value
+}
+
+func (v *VString) Type() string {
+	return "string"
 }
 
 func (v *VString) CompareWith(other VType) int {
@@ -151,6 +168,10 @@ func (v *VInteger) String() string {
 
 func (v *VInteger) Value() interface{} {
 	return v.value
+}
+
+func (v *VInteger) Type() string {
+	return "integer"
 }
 
 func (v *VInteger) CompareWith(other VType) int {

@@ -10,6 +10,19 @@ func BootedTable() *Table {
 
 	t := map[string] Function {
 
+		// Reflection
+
+		"defined": func(s *Stack, t *Table) VType {
+			v := NewVString(t.Defined())
+			s.push(v)
+			return v
+		},
+		"type": func(s *Stack, t *Table) VType {
+			v := NewVString(s.pop().Type())
+			s.push(v)
+			return v
+		},
+
 		// Type conversion
 
 		"string": func(s *Stack, t *Table) VType {
@@ -21,9 +34,9 @@ func BootedTable() *Table {
 		// Basic I/O
 
 		"print": func(s *Stack, t *Table) VType {
-			v := s.popString()
-			fmt.Println(v.String())
-			return v
+			v := s.popString().String()
+			fmt.Println(v[1:len(v)-1])
+			return VNil()
 		},
 
 		// Stack operations
@@ -125,15 +138,6 @@ func BootedTable() *Table {
 			s.push(val)
 			return VNil()
 		},
-		"not": func(s *Stack, t *Table) VType {
-			a := s.pop().Value().(bool)
-			val := VTrue()
-			if a {
-				val = VFalse()
-			}
-			s.push(val)
-			return VNil()
-		},
 
 		"compare": func(s *Stack, t *Table) VType {
 			a := s.pop()
@@ -182,7 +186,7 @@ func BootedTable() *Table {
 		"alias": func(s *Stack, t *Table) VType {
 			from := s.pop().Value().(string)
 			to := s.pop().Value().(string)
-			t.alias(from[1:len(from)-2], to[1:len(to)-2])
+			t.alias(from, to)
 			return VNil()
 		},
 		"define": func(s *Stack, t *Table) VType {

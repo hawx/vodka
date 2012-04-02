@@ -21,6 +21,20 @@ func (t *Table) String() string {
 	return s + "\n"
 }
 
+func (t *Table) Defined() string {
+	s := ""
+	for n, _ := range t.native {
+		s += n + " "
+	}
+	for n, _ := range t.functions {
+		s += n + " "
+	}
+	for n, _ := range t.aliases {
+		s += n + " "
+	}
+	return s
+}
+
 func (t *Table) call(name string, s *Stack) VType {
 	var e VType = VNil()
 	if n, np := t.native[name]; np {
@@ -46,7 +60,7 @@ func (t *Table) define(name string, f Function) {
 }
 
 func (t *Table) defineNative(name string, ts *Tokens) {
-	t.native[name[1:len(name)-2]] = *ts
+	t.native[name] = *ts
 }
 
 func (t *Table) alias(from, to string) {

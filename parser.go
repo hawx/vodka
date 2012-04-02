@@ -40,9 +40,24 @@ func NewToken(key, val string) Token {
 }
 
 
-func Parse(code string) *Tokens {
-	tokens := strings.Fields(code)
+func Split(code string) []string {
+	r := make([]string, 1)
+	s := strings.Split(code, "\n")
 
+	for _, line := range s {
+		if !strings.HasPrefix(strings.TrimSpace(line), ";") {
+			sp := strings.Split(line, " ")
+			for _, word := range sp {
+				r = append(r, word)
+			}
+		}
+	}
+
+	return r
+}
+
+func Parse(code string) *Tokens {
+	tokens := Split(code)
   list := new(Tokens)
 
 	// Define some regular expressions
@@ -50,7 +65,7 @@ func Parse(code string) *Tokens {
 	fun, _ := regexp.Compile(".+")
 
 	for i := 0; i < len(tokens); i++ {
-		tok := tokens[i]
+		tok := strings.TrimSpace(tokens[i])
 
 		if tok == "." {
 			*list = append(*list, NewToken("stm", ""))
@@ -61,17 +76,17 @@ func Parse(code string) *Tokens {
 		} else if strings.HasPrefix(tok, "'") {
 			idx, found := parseString(tokens, "'", i)
 			i = idx
-			*list = append(*list, NewToken("str", found))
+			*list = append(*list, NewToken("str", found[1:len(found)-1]))
 
 		} else if strings.HasPrefix(tok, "\"") {
 			idx, found := parseString(tokens, "\"", i)
 			i = idx
-			*list = append(*list, NewToken("str", found))
+			*list = append(*list, NewToken("str", found[1:len(found)-1]))
 
 		} else if strings.HasPrefix(tok, ":") {
-			*list = append(*list, NewToken("stm", tok[1:len(tok)]))
+			*list = append(*list, NewToken("stm", tok[1:]))
 
-		} else if strings.TrimSpace(tok) ==  "[" {
+		} else if tok ==  "[" {
 			i++
 			idx, found := parseBlock(tokens, i)
 			i = idx
@@ -83,7 +98,7 @@ func Parse(code string) *Tokens {
 			*list = append(*list, NewToken("stm", found))
 
 		} else if fun.MatchString(tok) {
-			*list = append(*list, NewToken("fun", strings.TrimSpace(tok)))
+			*list = append(*list, NewToken("fun", tok))
 		}
 	}
 
@@ -99,7 +114,7 @@ func parseString(tokens []string, until string, idx int) (i int, str string) {
 		tok := tokens[i]
 		str += tok + " "
 		if strings.HasSuffix(tok, until) {
-			return i, str
+			return i, strings.TrimSpace(str)
 		}
 	}
 	return len(tokens), strings.TrimSpace(str)
