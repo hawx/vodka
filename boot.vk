@@ -20,6 +20,9 @@
 'inc' '++' alias
 'dec' '--' alias
 
+'zero?' [
+  0 eq?
+] define
 
 ; Logical operations
 
