@@ -10,7 +10,6 @@ package main
 
 import (
 	"strings"
-	"regexp"
 )
 
 type Tokens []Token
@@ -40,110 +39,94 @@ func NewToken(key, val string) Token {
 }
 
 
-func Split(code string) []string {
-	r := make([]string, 1)
-	s := strings.Split(code, "\n")
-
-	for _, line := range s {
-		if !strings.HasPrefix(strings.TrimSpace(line), ";") {
-			sp := strings.Split(line, " ")
-			for _, word := range sp {
-				r = append(r, word)
-			}
-		}
-	}
-
-	return r
-}
-
 func Parse(code string) *Tokens {
-	tokens := Split(code)
-  list := new(Tokens)
+	list := new(Tokens)
 
-	// Define some regular expressions
-	integerv, _ := regexp.Compile("[0-9]+")
-	fun, _ := regexp.Compile(".+")
+	for i := 0; i < len(code); i++ {
+		temp := ""
 
-	for i := 0; i < len(tokens); i++ {
-		tok := strings.TrimSpace(tokens[i])
+		switch c := code[i]; c {
+		case '\n', '\t', ' ':
+			// Ignore whitespace
 
-		if tok == "." {
+		case ';':
+			i, _ = ParseUntil(i, code, '\n')
+
+		case '.':
 			*list = append(*list, NewToken("stm", ""))
 
-		} else if integerv.MatchString(tok) {
-			*list = append(*list, NewToken("int", tok))
-
-		} else if strings.HasPrefix(tok, "'") {
-			idx, found := parseString(tokens, "'", i)
-			i = idx
-			*list = append(*list, NewToken("str", found[1:len(found)-1]))
-
-		} else if strings.HasPrefix(tok, "\"") {
-			idx, found := parseString(tokens, "\"", i)
-			i = idx
-			*list = append(*list, NewToken("str", found[1:len(found)-1]))
-
-		} else if strings.HasPrefix(tok, ":") {
-			*list = append(*list, NewToken("stm", tok[1:]))
-
-		} else if tok ==  "[" {
+		case '\'':
 			i++
-			idx, found := parseBlock(tokens, i)
-			i = idx
-			*list = append(*list, NewToken("stm", found))
+			i, temp = ParseUntil(i, code, '\'')
+			*list = append(*list, NewToken("str", temp))
 
-		} else if strings.HasPrefix(tok, "[") {
-			idx, found := parseBlock(tokens, i)
-			i = idx
-			*list = append(*list, NewToken("stm", found))
+		case '"':
+			i++
+			i, temp = ParseUntil(i, code, '"')
+			*list = append(*list, NewToken("str", temp))
 
-		} else if fun.MatchString(tok) {
-			*list = append(*list, NewToken("fun", tok))
+		case '[':
+			i++
+			i, temp = ParseMatching(i, code, '[', ']')
+			*list = append(*list, NewToken("stm", temp))
+
+		case ':':
+			i++
+			i, temp = ParseUntilWhitespace(i, code)
+			*list = append(*list, NewToken("stm", temp))
+
+		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			i, temp = ParseUntilWhitespace(i, code)
+			*list = append(*list, NewToken("int", temp))
+
+		default:
+			i, temp = ParseUntilWhitespace(i, code)
+			*list = append(*list, NewToken("fun", temp))
+
 		}
 	}
 
 	return list
 }
 
-
-// Parses until a token ending in +until+ is found, returning what has been found
-// as a string.
-func parseString(tokens []string, until string, idx int) (i int, str string) {
-	str = ""
-	for i := idx; i < len(tokens); i++ {
-		tok := tokens[i]
-		str += tok + " "
-		if strings.HasSuffix(tok, until) {
-			return i, strings.TrimSpace(str)
-		}
-	}
-	return len(tokens), strings.TrimSpace(str)
+func ParseUntil(idx int, code string, until uint8) (i int, s string) {
+	return ParseUntilAny(idx, code, []uint8{until})
 }
 
+func ParseUntilWhitespace(idx int, code string) (i int, s string) {
+	return ParseUntilAny(idx, code, []uint8{' ', '\n', '\t'})
+}
 
-// Parses a block, some tokens surrounded by square brackets.
-func parseBlock(tokens []string, idx int) (i int, str string) {
-	str = ""
-	for i := idx; i < len(tokens); i++ {
-		tok := tokens[i]
+func ParseUntilAny(idx int, code string, untils []uint8) (i int, s string) {
+	str := ""
 
-		if strings.HasPrefix(tok, "[") {
-			temp := ""
-			i++
-			i, temp = parseBlock(tokens, i)
-			i++
-			str += "[ " + temp + " ]"
-		} else {
-
-			if strings.TrimSpace(tok) == "]" {
-				return i, strings.TrimSpace(str)
-			}
-
-			str += tok + " "
-			if strings.HasSuffix(tok, "]") {
+	for i := idx; i < len(code); i++ {
+		c := code[i]
+		for _, until := range untils {
+			if c == until {
 				return i, strings.TrimSpace(str)
 			}
 		}
+		str += string(c)
 	}
-	return len(tokens), strings.TrimSpace(str)
+	return len(code), strings.TrimSpace(str)
+}
+
+func ParseMatching(idx int, code string, op, cl uint8) (i int, s string) {
+	str := ""
+
+	for i := idx; i < len(code); i++ {
+		c := code[i]
+		if c == op {
+			i++
+			f := ""
+			i, f = ParseMatching(i, code, op, cl)
+			str += "[" + f + "]"
+		} else if c == cl {
+			return i, strings.TrimSpace(str)
+		} else {
+			str += string(c)
+		}
+	}
+	return len(code), strings.TrimSpace(str)
 }
