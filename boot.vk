@@ -27,6 +27,11 @@
   0 eq?
 ] define
 
+'abs' [
+  dup 0 lt?
+  :neg unless
+] define
+
 'fact' [
   dup zero?
   [ dup dec fact mult ]

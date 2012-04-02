@@ -102,6 +102,11 @@ func BootedTable() *Table {
 			s.push(div)
 			return div
 		},
+		"neg": func(s *Stack, t *Table) VType {
+			val := NewVIntegerInt(-s.pop().Value().(int))
+			s.push(val)
+			return val
+		},
 
 		// Logical
 
