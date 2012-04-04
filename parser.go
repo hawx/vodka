@@ -1,12 +1,10 @@
 package main
 
-
 // Synopsis:
 //
 //   Parse("1 2 + 'Hello World' [ '!' append ] 5 times")
 //   ;=> [[fun: 1] [fun: 2] [fun: +] [str: 'Hello World'] [stm: '!' append]
 //         [fun: 5] [fun: times]]
-
 
 import (
 	"strings"
@@ -26,8 +24,8 @@ func (ts *Tokens) String() string {
 }
 
 type Token struct {
-	key  string
-	val  string
+	key string
+	val string
 }
 
 func (t *Token) String() string {
@@ -37,7 +35,6 @@ func (t *Token) String() string {
 func NewToken(key, val string) Token {
 	return Token{key, val}
 }
-
 
 func FullParse(code string) *Tokens {
 	list := new(Tokens)

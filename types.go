@@ -8,15 +8,15 @@ import (
 // TYPES --------------------------------------------
 
 type VType interface {
-	String()            string
-	Value()             interface{}
-	Type()              string
-	CompareWith(VType)  int
+	String() string
+	Value() interface{}
+	Type() string
+	CompareWith(VType) int
 }
 
 // SPECIALS ---------------------------------------------
 
-type VNilType struct { }
+type VNilType struct{}
 
 func (v *VNilType) String() string {
 	return "nil"
@@ -163,7 +163,7 @@ type VInteger struct {
 }
 
 func (v *VInteger) String() string {
-	return strconv.Itob(v.value, 10)
+	return strconv.FormatInt(int64(v.value), 10)
 }
 
 func (v *VInteger) Value() interface{} {

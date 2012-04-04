@@ -8,7 +8,7 @@ import (
 func BootedTable() *Table {
 	tbl := NewTable()
 
-	t := map[string] Function {
+	t := map[string]Function{
 
 		// Reflection
 
@@ -35,7 +35,7 @@ func BootedTable() *Table {
 
 		"print": func(s *Stack, t *Table) VType {
 			v := s.popString().String()
-			fmt.Println(v[1:len(v)-1])
+			fmt.Println(v[1 : len(v)-1])
 			return VNil()
 		},
 
@@ -200,7 +200,6 @@ func BootedTable() *Table {
 			t.defineNative(name, stms)
 			return VNil()
 		},
-
 	}
 
 	tbl.functions = t
@@ -210,7 +209,6 @@ func BootedTable() *Table {
 
 	return tbl
 }
-
 
 func BareEval(code string) {
 	tokens := Parse(code)

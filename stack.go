@@ -63,7 +63,7 @@ func (k *Stack) peek(n int) []VType {
 		return *k
 	}
 	last := len(*k)
-	s := (*k)[last-n:last]
+	s := (*k)[last-n : last]
 	return s
 }
 

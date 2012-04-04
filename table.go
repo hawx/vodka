@@ -2,9 +2,9 @@ package main
 
 type Function func(*Stack, *Table) VType
 type Table struct {
-	native    map[string] Tokens
-	functions map[string] Function
-	aliases   map[string] string
+	native    map[string]Tokens
+	functions map[string]Function
+	aliases   map[string]string
 }
 
 func (t *Table) String() string {
@@ -70,13 +70,13 @@ func (t *Table) alias(from, to string) {
 func NewTable() *Table {
 	tbl := new(Table)
 
-	n := map[string] Tokens { }
+	n := map[string]Tokens{}
 	tbl.native = n
 
-	f := map[string] Function { }
+	f := map[string]Function{}
 	tbl.functions = f
 
-	a := map[string] string { }
+	a := map[string]string{}
 	tbl.aliases = a
 
 	return tbl

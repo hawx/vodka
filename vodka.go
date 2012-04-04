@@ -1,10 +1,10 @@
 package main
 
 import (
-	"io/ioutil"
-	"fmt"
-	"os"
 	"bufio"
+	"fmt"
+	"io/ioutil"
+	"os"
 )
 
 func toString(bytes []uint8) string {
