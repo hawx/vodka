@@ -24,8 +24,12 @@ func promptLine(prompt string) string {
 
 func main() {
 	if len(os.Args) == 2 {
-		contents, _ := ioutil.ReadFile(os.Args[1])
-		BareEval(string(contents))
+		if os.Args[1] == "doc" {
+			Doc([]string{"boot.vk"}, "doc")
+		} else {
+			contents, _ := ioutil.ReadFile(os.Args[1])
+			BareEval(string(contents))
+		}
 
 	} else {
 		fmt.Println("Vodka REPL, CTRL+C or type 'quit' to quit")

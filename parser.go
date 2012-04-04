@@ -39,7 +39,7 @@ func NewToken(key, val string) Token {
 }
 
 
-func Parse(code string) *Tokens {
+func FullParse(code string) *Tokens {
 	list := new(Tokens)
 
 	for i := 0; i < len(code); i++ {
@@ -50,7 +50,8 @@ func Parse(code string) *Tokens {
 			// Ignore whitespace
 
 		case ';':
-			i, _ = ParseUntil(i, code, '\n')
+			i, temp = ParseUntil(i, code, '\n')
+			*list = append(*list, NewToken("comment", strings.TrimSpace(strings.TrimLeft(temp, ";"))))
 
 		case '.':
 			*list = append(*list, NewToken("stm", ""))
@@ -83,6 +84,18 @@ func Parse(code string) *Tokens {
 			i, temp = ParseUntilWhitespace(i, code)
 			*list = append(*list, NewToken("fun", temp))
 
+		}
+	}
+
+	return list
+}
+
+func Parse(code string) *Tokens {
+	list := new(Tokens)
+
+	for _, tok := range *FullParse(code) {
+		if tok.key != "comment" {
+			*list = append(*list, tok)
 		}
 	}
 

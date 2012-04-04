@@ -7,6 +7,7 @@ GOFILES=\
 	table.go\
 	stack.go\
 	interpreter.go\
+	doc.go\
 	vodka.go\
 
 include $(GOROOT)/src/Make.pkg
