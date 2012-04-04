@@ -7,13 +7,14 @@ and features a few syntax changes.
 
 ## Building
 
-To get up and running with a REPL run,
+To get up and running make sure you have Go 1 installed (`brew install go` with
+homebrew). Then to start a REPL run,
 
 ``` bash
-$ cd place-download-to
-$ gomake && 6l _go_.6 && mv 6.out vodka
+$ cd place-downloaded-to
+$ go build
 $ ./vodka
-Vodka REPL, CTRL+C or type 'quit' to quit
+Vodka REPL, CTRL+C, or type 'quit' to quit
 >>
 ```
 
