@@ -43,12 +43,16 @@ func FullParse(code string) *Tokens {
 		temp := ""
 
 		switch c := code[i]; c {
-		case '\n', '\t', ' ':
+		case '\t', ' ':
 			// Ignore whitespace
+
+		case '\n':
+			*list = append(*list, NewToken("newline", ""))
 
 		case ';':
 			i, temp = ParseUntil(i, code, '\n')
-			*list = append(*list, NewToken("comment", strings.TrimSpace(strings.TrimLeft(temp, ";"))))
+			*list = append(*list, NewToken("comment",
+				strings.TrimSpace(strings.TrimLeft(temp, ";"))))
 
 		case '.':
 			*list = append(*list, NewToken("stm", ""))
@@ -91,7 +95,7 @@ func Parse(code string) *Tokens {
 	list := new(Tokens)
 
 	for _, tok := range *FullParse(code) {
-		if tok.key != "comment" {
+		if tok.key != "comment" && tok.key != "newline" {
 			*list = append(*list, tok)
 		}
 	}
