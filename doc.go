@@ -30,7 +30,7 @@ func (f *FunctionDoc) lines() []string {
 func (f *FunctionDoc) Meta(name string) string {
 	for _, line := range f.lines() {
 		if strings.HasPrefix(line, name + ":") {
-			return strings.TrimLeft(line, name + ":\n\t ")
+			return strings.TrimSpace(line[len(name)+1:])
 		}
 	}
 	return ""
@@ -137,7 +137,7 @@ func collectComments(list Tokens, idx int) (int, string) {
 	doc := ""
 	for i := idx; i < len(list); i++ {
 		if list[i].key == "comment" {
-			doc += strings.TrimSpace(list[i].val) + "\n"
+			doc += strings.TrimSpace(list[i].val) + " \n"
 		} else {
 			return i, doc
 		}
