@@ -78,7 +78,7 @@
 
 'nil?'     [ type 'nil'     = ] define
 'boolean?' [ type 'boolean' = ] define
-'tokens?'  [ type 'tokens'  = ] define
+'block?'   [ type 'block'   = ] define
 'string?'  [ type 'string'  = ] define
 'integer?' [ type 'integer' = ] define
 

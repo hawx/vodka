@@ -58,11 +58,9 @@ order,
 
 ### Blocks
 
-Note the spaces around the square brackets are necessary,
-
 ``` bash
 >> [ dup * ]
-[[dup *]] => nil
+[block:[dup *]] => nil
 ```
 
 And we're done. So how about a slightly useful calculation showing some features

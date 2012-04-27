@@ -232,7 +232,7 @@ func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
 			stk.push(NewVInteger(tok.val))
 
 		case "stm":
-			stk.push(NewVTokens(tok.val))
+			stk.push(NewVBlock(tok.val))
 
 		case "fun":
 			if tbl.has(tok.val) {

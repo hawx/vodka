@@ -86,26 +86,26 @@ func VFalse() *VBoolean {
 	return NewVBoolean(false)
 }
 
-// TOKENS ---------------------------------------------
+// BLOCK ---------------------------------------------
 
-type VTokens struct {
+type VBlock struct {
 	value string
 }
 
-func (v *VTokens) String() string {
-	return "tokens:[ " + v.value + " ]"
+func (v *VBlock) String() string {
+	return "block:[ " + v.value + " ]"
 }
 
-func (v *VTokens) Value() interface{} {
+func (v *VBlock) Value() interface{} {
 	return Parse(v.value)
 }
 
-func (v *VTokens) Type() string {
-	return "tokens"
+func (v *VBlock) Type() string {
+	return "block"
 }
 
-func (v *VTokens) CompareWith(other VType) int {
-	if val, same := other.(*VTokens); same {
+func (v *VBlock) CompareWith(other VType) int {
+	if val, same := other.(*VBlock); same {
 		if val.value == v.value {
 			return 0
 		}
@@ -113,8 +113,8 @@ func (v *VTokens) CompareWith(other VType) int {
 	return -2
 }
 
-func NewVTokens(s string) *VTokens {
-	r := new(VTokens)
+func NewVBlock(s string) *VBlock {
+	r := new(VBlock)
 	r.value = strings.TrimSpace(s)
 	return r
 }
