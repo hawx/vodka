@@ -1,37 +1,106 @@
-; Stack operations
+; group: Stack operations
 
+; Removes the element from the top of the stack.
+; sig: 'a ->
+'pop' __document__
+
+; Pushes the size of the stack on to the top of the stack.
+; sig: -> int
+'size' __document__
+
+; Pushes a copy of the top element to the stack.
+; sig: 'a -> 'a 'a
+'dup' __document__
+
+; Swaps the top two elements on the stack.
+; sig: 'a 'b -> 'b 'a
+'swap' __document__
+
+; Swaps the second and third elements on the stack.
+; sig: 'a 'b 'c -> 'b 'a 'c
+'swapp' __document__
+
+; Removes all elements from the stack.
+; sig: 'A ->
+'drop' __document__
+
+; Calls the block on the top of the stack for each element on the stack,
+; should be used with a reductive function.
+; sig: 'A -> 'a
 'stack' [ size 2 - times ] define
 
-; Arithmetic operations
+; group: Arithmetic operations
+
+; Adds the top two elements of the stack together.
+; sig: int int -> int
+; example: 5 2 add ;=> [7]
+'add' __document__
+
+; Multiples the top two elements of the stack together.
+; sig: int int -> int
+; example: 5 2 mult ;=> [10]
+'mult' __document__
+
+; Subtracts the top element of the stack from the second.
+; sig: int int -> int
+; example: 5 2 sub ;=> [3]
+'sub' __document__
+
+; Divides the second element of the stack by the second. Does integer division
+; only at the moment, this does not round to the nearest integer.
+; sig: int int -> int
+; example: 5 2 div ;=> [2]
+'div' __document__
+
+; Negates the number at the top of the stack.
+; sig: int -> int
+; example: 5 neg ;=> [-5]
+'neg' __document__
 
 'add'  '+' alias
 'mult' '*' alias
 'sub'  '-' alias
 'div'  '/' alias
 
+; Sums all values on the stack.
+; sig: 'A -> int
 'sum' [
   :+ stack
 ] define
 
+; Multiplies all values on the stack.
+; sig: 'A -> int
 'prod' [
   :* stack
 ] define
 
+; Increments the number at the top of the stack.
+; sig: int -> int
 'inc' [ 1 add ] define
+
+; Decrements the number at the top of the stack.
+; sig: int -> int
 'dec' [ 1 sub ] define
 
 'inc' '++' alias
 'dec' '--' alias
 
+; Checks whether the top element is 0.
+; sig: 'a -> bool
 'zero?' [
   0 eq?
 ] define
 
+; Replaces the number at the top of the stack with it's absolute value.
+; sig: int -> int
 'abs' [
   dup 0 lt?
   :neg unless
 ] define
 
+; Calculates the factorial of the number at the top of the stack.
+; sig: int -> int
+; example: 5 fact ;=> [120]
 'fact' [
   dup zero?
   [ dup dec fact mult ]
@@ -39,8 +108,34 @@
   if-else
 ] define
 
-; Logical operations
+; group: Logical operations
 
+; Calculates the value of a boolean or operation applied to the top two elements
+; of the stack.
+; sig: bool bool -> bool
+; example: true false or ;=> [true]
+'or' __document__
+
+; Calculates the value of a boolean and operation applied to the top two
+; elements of the stack.
+; sig: bool bool -> bool
+; example: true false and ;=> [false]
+'and' __document__
+
+; Compares the top two elements of the stack, pushes -1 if the top element is
+; less than the second, 0 if the elements are equal or 1 if the top element is
+; greater.
+; sig: 'a 'b -> int
+; example: 1 2 compare ;=> [1]
+'compare' __document__
+
+; Checks if the top two elements are equal.
+; sig: 'a 'b -> bool
+; example: 1 1 eq? ;=> [true]
+'eq?' __document__
+
+; Returns the opposite of the boolean value at the top of the stack.
+; sig: bool -> bool
 'not' [
   :true :false if-else
 ] define
@@ -66,12 +161,26 @@
 'gte?' '>=' alias
 
 
-; Reflection
+; group: Reflection
 
+; Pushes a string containing all defined functions on to the stack.
+; sig: -> string
+'defined' __document__
+
+; Replaces the element at the top of the stack with a string describing it's
+; type.
+; sig: 'a -> string
+; example: 123 type ;=> ['int']
+'type' __document__
+
+; Checks whether there are no elements on the stack.
+; sig: -> bool
 'empty?' [
   size 0 eq?
 ] define
 
+; Checks whether the stack contains one or less elements.
+; sig: -> bool
 'small?' [
   size 1 lte?
 ] define
@@ -83,12 +192,47 @@
 'integer?' [ type 'integer' = ] define
 
 
-; Control flow
+; group: Control flow
 
+; Calls the block at the top of the stack if the condition is true, or the
+; second if the condition is false.
+; sig: bool block block -> 'a
+; example: 300 300 eq? [ "yes" ] [ "no" ] if-else ;=> ["yes"]
+'if-else' __document__
+
+; Calls the block at the top of the stack.
+; sig: block -> 'a
+; example: 300 :inc call ;=> [301]
+'call' __document__
+
+; Calls the second element of the stack n times, where n is the top element.
+; sig: block int -> 'a
+; example: 300 :inc 5 times ;=> [305]
+'times' __document__
+
+; Evaluates the block at the top of the stack if the value below it is true.
+; sig: bool block -> 'a
+; example: 300 300 eq? [ "300 equals 300, crazy!" print ] if
 'if' [
   . swap if-else
 ] define
 
+; Evaluates the block at the top of the stack if the value below it is false.
+; sig: bool block -> 'a
 'unless' [
   swap not swap if
 ] define
+
+
+; group: Definition
+
+; Defines an alias which when used will call the aliased function.
+; sig: string string ->
+; example: 'add' '+' alias
+'alias' __document__
+
+; Defines a new function with the name given, when called the block passed will
+; be called.
+; sig: string block ->
+; example: 'sq' [ dup * ] define
+'define' __document__
