@@ -10,6 +10,7 @@ type FunctionDoc struct {
 	name  string
 	doc   string
 	src   string
+	grp   string
 }
 
 func (f *FunctionDoc) String() string {
@@ -44,7 +45,7 @@ func (f *FunctionDoc) Html() string {
 	s := "<li>\n"
 	s += "  <h1 id='" + f.name + "'>" + f.name + "</h1>\n"
 	if f.HasMeta("sig") {
-		s += "  <h2>" + f.Meta("sig") + "</h2>\n"
+		s += "  <h2>" + strings.Replace(f.Meta("sig"), "->", "→", 1) + "</h2>\n"
 	}
 	s += "  <p>" + f.String() + "<p>\n"
 	if f.HasMeta("example") {
@@ -83,15 +84,28 @@ func Doc(input []string, output string) {
 		contents, _ := ioutil.ReadFile(file)
 		list := FullParse(string(contents))
 
+		docs := split(*list)
+
 		html := ""
-		s += "<ul class='summary'>\n"
-		for _, d := range split(*list) {
+		group := docs[0].grp
+		s += "<div class='summary'>\n"
+		if group != "" {
+			s += "<h3>" + group + "</h3>\n"
+			html += "<h1 class='group'>" + group + "</h1>"
+		}
+		s += "<ul>\n"
+		for _, d := range docs {
+			if d.grp != group {
+				group = d.grp
+				s += "</ul>\n<h3>" + group + "</h3>\n<ul>\n"
+				html += "<h1 class='group'>" + group + "</h1>"
+			}
 			s += "<li><a href='#" + d.name + "'>" + d.name + "</a></li>\n"
 			html += d.Html()
 		}
 		s += "  <div style='clear:both;'></div>\n"
-		s += "</ul>\n"
-		s += "<ul>\n" + html + "</ul>\n"
+		s += "</ul>\n</div>\n"
+		s += "<ul class='docs'>\n" + html + "</ul>\n"
 	}
 
 	s += "</body>\n</html>"
@@ -111,20 +125,26 @@ func Doc(input []string, output string) {
 //
 func split(list Tokens) []FunctionDoc {
 	docs := []FunctionDoc{}
+	group := ""
 
 	for i := 0; i < len(list); i++ {
 		if list[i].key == "comment" {
-			idx, doc := collectComments(list, i)
-			i = idx
-			// note that i has been changed by collectComments
-			if list[i].key == "str" {
-				name := list[i].val
-				i++
-				if list[i].key == "stm" {
-					docs = append(docs, FunctionDoc{name, doc, list[i].val})
+			if strings.HasPrefix(list[i].val, "group: ") {
+				group = list[i].val[7:]
 
-				} else if list[i].key == "fun" && list[i].val == "__document__" {
-					docs = append(docs, FunctionDoc{name, doc, ""})
+			} else {
+				idx, doc := collectComments(list, i)
+				i = idx
+				// note that i has been changed by collectComments
+				if list[i].key == "str" {
+					name := list[i].val
+					i++
+					if list[i].key == "stm" {
+						docs = append(docs, FunctionDoc{name, doc, list[i].val, group})
+
+					} else if list[i].key == "fun" && list[i].val == "__document__" {
+						docs = append(docs, FunctionDoc{name, doc, "", group})
+					}
 				}
 			}
 		}

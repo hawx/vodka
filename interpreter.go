@@ -10,6 +10,10 @@ func BootedTable() *Table {
 
 	t := map[string]Function{
 
+		"__document__": func(s *Stack, t *Table) VType {
+			return VNil()
+		},
+
 		// Reflection
 
 		"defined": func(s *Stack, t *Table) VType {
