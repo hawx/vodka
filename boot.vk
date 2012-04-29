@@ -24,6 +24,11 @@
 ; sig: 'A ->
 'drop' __document__
 
+; Composes the two blocks at the top of the stack, forming one single block.
+; sig: block block -> block
+; example: [ dup dec ] :mult compose ;=> [block:[ dup dec mult ]]
+'compose' __document__
+
 ; Calls the block on the top of the stack for each element on the stack,
 ; should be used with a reductive function.
 ; sig: 'A -> 'a

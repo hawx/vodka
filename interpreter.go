@@ -79,6 +79,13 @@ func BootedTable() *Table {
 			s.clear()
 			return VNil()
 		},
+		"compose": func(s *Stack, t *Table) VType {
+			a := s.pop()
+			b := s.pop()
+			c := NewVBlock(b.(*VBlock).value + " " + a.(*VBlock).value)
+			s.push(c)
+			return VNil()
+		},
 
 		// Arithmetic operations
 
