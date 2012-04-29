@@ -223,6 +223,26 @@
   swap not swap if
 ] define
 
+; Evalutes the second block on the third element of the stack while the
+; condition at the top of the stack is true.
+; sig: block (block -> bool) -> 'a
+; example: 5 :dec [ zero? ! ] while ;=> [0]
+'while' [
+  swapp swap dup
+  swapp swap dup
+  swapp call
+
+  ; If condition is false, cleanup
+  [ pop swap pop ]
+  ; If condition is still true
+  [
+    swap swapp swap
+    dup  swapp call
+    swap swapp swap
+    while
+  ]
+  if-else
+] define
 
 ; group: Definition
 
