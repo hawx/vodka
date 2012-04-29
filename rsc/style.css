@@ -96,6 +96,26 @@ code {
   font: 0.9em Menlo;
 }
 
+code .comment {
+    color: rgb(150, 150, 150);
+}
+
+code .integer {
+    color: rgb(210, 80, 60);
+}
+
+code .constant.language {
+    color: rgb(42, 138, 108);
+}
+
+code .string {
+    color: rgb(94, 172, 62);
+}
+
+code .support {
+    color: rgb(141, 55, 131);
+}
+
 /*
   Change to 2 column layout when window is wide enough
   */

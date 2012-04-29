@@ -4,6 +4,8 @@ import (
 	"strings"
 	"regexp"
 	"io/ioutil"
+	"github.com/hoisie/mustache"
+	"sort"
 )
 
 type FunctionDoc struct {
@@ -41,77 +43,114 @@ func (f *FunctionDoc) HasMeta(name string) bool {
 	return f.Meta(name) != ""
 }
 
-func (f *FunctionDoc) Html() string {
-	s := "<li>\n"
-	s += "  <h1 id='" + f.name + "'>" + f.name + "</h1>\n"
-	if f.HasMeta("sig") {
-		s += "  <h2>" + strings.Replace(f.Meta("sig"), "->", "→", 1) + "</h2>\n"
-	}
-	s += "  <p>" + f.String() + "<p>\n"
-	if f.HasMeta("example") {
-		s += "  <div class='example'>\n"
-		s += "    <h3>Example</h3>\n"
-		s += "    <pre><code>" + f.Meta("example") + "</code></pre>\n"
-		s += "  </div>\n"
-	}
-	if f.src != "" {
-		s += "  <div class='source'>\n"
-		s += "    <h3>Source</h3>\n"
-		s += "    <pre><code>" + f.src + "</code></pre>\n"
-		s += "  </div>\n"
-	}
-	s += "</li>\n"
 
-	return s
+type FunctionData struct {
+	Name         string
+	Sig          string
+	Description  string
+	Example      interface{}
+	Source       interface{}
 }
 
-// Generates documentation for the given list of input files, writing the output
-// to the output directory given.
-func Doc(input []string, output string) {
-	s := "<!DOCTYPE html>\n" +
-		"<html>\n" +
-		"  <head>\n" +
-		"    <meta charset='utf-8' />" +
-		"    <title>Docs</title>\n" +
-		"    <link rel='stylesheet' href='style.css' type='text/css' />\n" +
-		"  </head>\n" +
-		"  <body>\n" +
-		"    <header>\n" +
-		"      <h1>Docs</h1>\n" +
-		"    </header>\n"
+func (f *FunctionDoc) Data() FunctionData {
+	r := new(FunctionData)
 
-	for _, file := range input {
-		contents, _ := ioutil.ReadFile(file)
-		list := FullParse(string(contents))
-
-		docs := split(*list)
-
-		html := ""
-		group := docs[0].grp
-		s += "<div class='summary'>\n"
-		if group != "" {
-			s += "<h3>" + group + "</h3>\n"
-			html += "<h1 class='group'>" + group + "</h1>"
-		}
-		s += "<ul>\n"
-		for _, d := range docs {
-			if d.grp != group {
-				group = d.grp
-				s += "</ul>\n<h3>" + group + "</h3>\n<ul>\n"
-				html += "<h1 class='group'>" + group + "</h1>"
-			}
-			s += "<li><a href='#" + d.name + "'>" + d.name + "</a></li>\n"
-			html += d.Html()
-		}
-		s += "  <div style='clear:both;'></div>\n"
-		s += "</ul>\n</div>\n"
-		s += "<ul class='docs'>\n" + html + "</ul>\n"
+	r.Name        = f.name
+	r.Sig         = strings.Replace(f.Meta("sig"), "->", "→", -1)
+	r.Description = f.String()
+	if f.HasMeta("example") {
+		r.Example   = f.Meta("example")
+	}
+	if f.src != "" {
+		r.Source    = f.src
 	}
 
-	s += "</body>\n</html>"
+	return *r
+}
 
-	ioutil.WriteFile(output, []byte(s), 0644)
-	// println(s)
+type GroupData struct {
+	Group      string
+	GroupID    string
+	Functions  *[]FunctionData
+}
+
+func NewGroupData(name string) GroupData {
+	r := new(GroupData)
+	r.Group = name
+	r.GroupID = strings.Replace(name, " ", "", -1)
+	r.Functions = new([]FunctionData)
+	return *r
+}
+
+func (g GroupData) AddFunctionData(fd FunctionData) {
+	*g.Functions = append(*g.Functions, fd)
+}
+
+// Allow sorting functions by name
+func (g GroupData) Len() int {
+	return len(*g.Functions)
+}
+
+func (g GroupData) Less(i, j int) bool {
+	return (*g.Functions)[i].Name < (*g.Functions)[j].Name
+}
+
+func (g GroupData) Swap(i, j int) {
+	(*g.Functions)[i], (*g.Functions)[j] = (*g.Functions)[j], (*g.Functions)[i]
+}
+
+// Allow sorting GroupDatas by name
+type GroupDatas []GroupData
+
+func (g GroupDatas) Len() int      { return len(g) }
+func (g GroupDatas) Swap(i, j int) { g[i], g[j] = g[j], g[i] }
+
+func (g GroupDatas) Less(i, j int) bool {
+	return g[i].Group < g[j].Group
+}
+
+func (g *GroupDatas) Add(val GroupData) {
+	*g = append(*g, val)
+}
+
+func Doc(input []string, output string) {
+	tmpl, _ := mustache.ParseFile("doc.mustache")
+
+	for _, file := range input {
+	  contents, _ := ioutil.ReadFile(file)
+		list := FullParse(string(contents))
+		docs := split(*list)
+
+		groupDatas := map[string]GroupData{}
+
+		// Set up all groups first
+		for _, d := range docs {
+			groupDatas[d.grp] = NewGroupData(d.grp)
+		}
+
+		// Now add functions
+		for _, d := range docs {
+			groupDatas[d.grp].AddFunctionData(d.Data())
+		}
+
+		// Now gather map values for array
+		finalDatas := new(GroupDatas)
+
+		for _, v := range groupDatas {
+			sort.Sort(v)
+			finalDatas.Add(v)
+		}
+
+		sort.Sort(finalDatas)
+
+		data := map[string]interface{}{
+			"Title": "Docs",
+			"Groups": finalDatas,
+		}
+
+		str := tmpl.Render(data)
+		ioutil.WriteFile(output, []byte(str), 0644)
+	}
 }
 
 // Takes the parsed list of tokens and splits them into function definitions

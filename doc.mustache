@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title>{{Title}}</title>
+    <link rel="stylesheet" href="rsc/style.css" type="text/css" />
+  </head>
+  <body>
+    <header>
+      <h1>{{Title}}</h1>
+    </header>
+
+    <ul class="summary">
+      {{#Groups}}
+        <li>
+          <a href="#{{GroupID}}">{{Group}}</a>
+          <ul>
+            {{#Functions}}
+              <li><a href="#{{Name}}">{{Name}}</a></li>
+            {{/Functions}}
+          </ul>
+        </li>
+      {{/Groups}}
+    </ul>
+
+    <ul class="docs">
+      {{#Groups}}
+        <h1 class="group">{{Group}}</h1>
+        {{#Functions}}
+          <li>
+            <h1 id="{{Name}}">{{Name}}</h1>
+            <h2>{{Sig}}</h2>
+            <p>{{Description}}</p>
+            {{#Example}}
+              <div class="example">
+                <h3>Example</h3>
+                <pre><code data-language="vodka">{{Example}}</code></pre>
+              </div>
+            {{/Example}}
+            {{#Source}}
+              <div class="source">
+                <h3>Source</h3>
+                <pre><code data-language="vodka">{{Source}}</code></pre>
+              </div>
+            {{/Source}}
+          </li>
+        {{/Functions}}
+      {{/Groups}}
+    </ul>
+
+    <script src="rsc/jquery.min.js"></script>
+    <script src="rsc/jquery.jstree.js"></script>
+    <script src="rsc/rainbow.min.js"></script>
+    <script src="rsc/rainbow.generic.js"></script>
+    <script src="rsc/rainbow.vodka.js"></script>
+    <script src="rsc/doc.js"></script>
+  </body>
+</html>
