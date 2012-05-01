@@ -1,3 +1,7 @@
+'include' [
+  '.vk' concat read eval
+] define
+
 ; group: Stack operations
 
 ; Removes the element from the top of the stack.
@@ -31,7 +35,7 @@
 
 ; Calls the block on the top of the stack for each element on the stack,
 ; should be used with a reductive function.
-; sig: 'A -> 'a
+; sig: 'A block -> 'a
 'stack' [ size 2 - times ] define
 
 ; group: Arithmetic operations

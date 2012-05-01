@@ -13,6 +13,11 @@ func BootedTable() *Table {
 		"__document__": func(s *Stack, t *Table) VType {
 			return VNil()
 		},
+		"eval": func(s *Stack, t *Table) VType {
+			str := s.pop().Value().(string)
+			_, _, v := Eval(str, s, t)
+			return v
+		},
 
 		// Reflection
 
@@ -34,13 +39,31 @@ func BootedTable() *Table {
 			s.push(v)
 			return v
 		},
+		"concat": func(s *Stack, t *Table) VType {
+			a := s.pop().Value().(string)
+			b := s.pop().Value().(string)
+			c := NewVString(b + a)
+			s.push(c)
+			return c
+		},
 
 		// Basic I/O
 
 		"print": func(s *Stack, t *Table) VType {
+			v := s.pop().Value().(string)
+			fmt.Println(v)
+			return VNil()
+		},
+		"p": func(s *Stack, t *Table) VType {
 			v := s.popString().String()
 			fmt.Println(v[1 : len(v)-1])
 			return VNil()
+		},
+		"read": func(s *Stack, t *Table) VType {
+			contents, _ := ioutil.ReadFile(s.pop().Value().(string))
+			str := NewVString(string(contents))
+			s.push(str)
+			return str
 		},
 
 		// Stack operations
