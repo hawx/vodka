@@ -77,9 +77,17 @@ func FullParse(code string) *Tokens {
 			i, temp = ParseUntilWhitespace(i, code)
 			*list = append(*list, NewToken("stm", temp))
 
-		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-':
+		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			i, temp = ParseUntilWhitespace(i, code)
 			*list = append(*list, NewToken("int", temp))
+
+		case '-':
+			i, temp = ParseUntilWhitespace(i, code)
+			if temp == "-" {
+				*list = append(*list, NewToken("fun", temp))
+			} else {
+				*list = append(*list, NewToken("int", temp))
+			}
 
 		default:
 			i, temp = ParseUntilWhitespace(i, code)
