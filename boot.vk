@@ -210,10 +210,18 @@
 ; example: 300 :inc call ;=> [301]
 'call' __document__
 
-; Calls the second element of the stack n times, where n is the top element.
-; sig: block int -> 'a
-; example: 300 :inc 5 times ;=> [305]
-'times' __document__
+; Calls the second element while temporarily removing the top element from the
+; stack.
+; sig: ( -> 'A) 'a -> 'A 'a
+; example: 5 :dec 'In the way' without ;=> [4 'In the way']
+'without' __document__
+
+; Calls the top element while temporarily removing the second element.
+; sig: 'a ( -> 'A) -> 'a 'A
+; example: 5 'In the way' :dec under ;=> [4 'In the way']
+'under' [
+  swap without
+] define
 
 ; Evaluates the block at the top of the stack if the value below it is true.
 ; sig: bool block -> 'a
@@ -233,20 +241,42 @@
 ; sig: block (block -> bool) -> 'a
 ; example: 5 :dec [ zero? ! ] while ;=> [0]
 'while' [
+  ; Evaluate the condition, while leaving copies of everything
   swapp swap dup
   swapp swap dup
   swapp call
 
   ; If condition is false, cleanup
-  [ pop swap pop ]
-  ; If condition is still true
+  [ pop pop ]
+  ; If condition is still true, ...
   [
-    swap swapp swap
-    dup  swapp call
-    swap swapp swap
+    swapp swap dup
+    swapp swap without2
     while
   ]
   if-else
+] define
+
+; Evaluates the second block while the condition at the top of the stack is
+; false.
+; sig: block ( -> bool) -> 'a
+; example: 5 :dec :zero? until ;=> 0
+'until' [
+  :not compose while
+] define
+
+; Calls the second element of the stack n times, where n is the top element.
+; sig: block int -> 'a
+; example: 300 :inc 5 times ;=> [305]
+'times' [
+  swap
+  wrap :dec swap compose :under compose
+  :zero?
+  ; 300 5 [ dec :inc under ] :zero? until
+  until
+
+  ; Cleanup counter
+  pop nil pop
 ] define
 
 ; group: Definition

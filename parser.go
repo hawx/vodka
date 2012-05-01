@@ -118,12 +118,12 @@ func ParseUntilAny(idx int, code string, untils []uint8) (i int, s string) {
 		c := code[i]
 		for _, until := range untils {
 			if c == until {
-				return i, strings.TrimSpace(str)
+				return i, str
 			}
 		}
 		str += string(c)
 	}
-	return len(code), strings.TrimSpace(str)
+	return len(code), str
 }
 
 func ParseMatching(idx int, code string, op, cl uint8) (i int, s string) {

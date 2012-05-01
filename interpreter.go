@@ -86,6 +86,12 @@ func BootedTable() *Table {
 			s.push(c)
 			return VNil()
 		},
+		"wrap": func(s *Stack, t *Table) VType {
+			b := s.pop()
+			r := NewVBlock("[" + b.(*VBlock).value + "]")
+			s.push(r)
+			return VNil()
+		},
 
 		// Arithmetic operations
 
@@ -184,18 +190,39 @@ func BootedTable() *Table {
 			return VNil()
 		},
 		"call": func(s *Stack, t *Table) VType {
-			a := s.pop().Value().(*Tokens)
-			Run(a, s, t)
-			return VNil()
-		},
-		"times": func(s *Stack, t *Table) VType {
-			n := s.pop().Value().(int)
-			f := s.pop().Value().(*Tokens)
-			for i := 0; i < n; i++ {
-				s, t, _ = Run(f, s, t)
+			val := s.top().Value()
+			switch val.(type) {
+			case *Tokens:
+				s.pop()
+				Run(val.(*Tokens), s, t)
+			case *VBlock:
+				toks := new(Tokens)
+				*toks = append(*toks, NewToken("fun", "call"))
+				Run(toks, s, t)
+			default:
+				println("Unexpected type")
 			}
 			return VNil()
 		},
+		"without": func(s *Stack, t *Table) VType {
+			save := s.pop()
+			tokens := new(Tokens)
+			*tokens = append(*tokens, NewToken("fun", "call"))
+			Run(tokens, s, t)
+			s.push(save)
+			return VNil()
+		},
+		"without2": func(s *Stack, t *Table) VType {
+			save1 := s.pop()
+			save2 := s.pop()
+			tokens := new(Tokens)
+			*tokens = append(*tokens, NewToken("fun", "call"))
+			Run(tokens, s, t)
+			s.push(save2)
+			s.push(save1)
+			return VNil()
+		},
+
 
 		// Definition
 
