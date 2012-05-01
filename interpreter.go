@@ -24,12 +24,12 @@ func BootedTable() *Table {
 		"defined": func(s *Stack, t *Table) VType {
 			v := NewVString(t.Defined())
 			s.push(v)
-			return v
+			return VNil()
 		},
 		"type": func(s *Stack, t *Table) VType {
 			v := NewVString(s.pop().Type())
 			s.push(v)
-			return v
+			return VNil()
 		},
 
 		// Type conversion
@@ -37,14 +37,14 @@ func BootedTable() *Table {
 		"string": func(s *Stack, t *Table) VType {
 			v := s.popString()
 			s.push(v)
-			return v
+			return VNil()
 		},
 		"concat": func(s *Stack, t *Table) VType {
 			a := s.pop().Value().(string)
 			b := s.pop().Value().(string)
 			c := NewVString(b + a)
 			s.push(c)
-			return c
+			return VNil()
 		},
 
 		// Basic I/O
@@ -63,7 +63,7 @@ func BootedTable() *Table {
 			contents, _ := ioutil.ReadFile(s.pop().Value().(string))
 			str := NewVString(string(contents))
 			s.push(str)
-			return str
+			return VNil()
 		},
 
 		// Stack operations
@@ -75,12 +75,12 @@ func BootedTable() *Table {
 		"size": func(s *Stack, t *Table) VType {
 			v := NewVIntegerInt(s.size())
 			s.push(v)
-			return v
+			return VNil()
 		},
 		"dup": func(s *Stack, t *Table) VType {
 			v := s.top()
 			s.push(v)
-			return v
+			return VNil()
 		},
 		"swap": func(s *Stack, t *Table) VType {
 			a := s.pop()
@@ -121,31 +121,31 @@ func BootedTable() *Table {
 		"add": func(s *Stack, t *Table) VType {
 			add := NewVIntegerInt(s.pop().Value().(int) + s.pop().Value().(int))
 			s.push(add)
-			return add
+			return VNil()
 		},
 		"mult": func(s *Stack, t *Table) VType {
 			mult := NewVIntegerInt(s.pop().Value().(int) * s.pop().Value().(int))
 			s.push(mult)
-			return mult
+			return VNil()
 		},
 		"sub": func(s *Stack, t *Table) VType {
 			a := s.pop().Value().(int)
 			b := s.pop().Value().(int)
 			sub := NewVIntegerInt(b - a)
 			s.push(sub)
-			return sub
+			return VNil()
 		},
 		"div": func(s *Stack, t *Table) VType {
 			a := s.pop().Value().(int)
 			b := s.pop().Value().(int)
 			div := NewVIntegerInt(b / a)
 			s.push(div)
-			return div
+			return VNil()
 		},
 		"neg": func(s *Stack, t *Table) VType {
 			val := NewVIntegerInt(-s.pop().Value().(int))
 			s.push(val)
-			return val
+			return VNil()
 		},
 
 		// Logical
@@ -189,14 +189,14 @@ func BootedTable() *Table {
 			b := s.pop()
 			val := NewVIntegerInt(a.CompareWith(b))
 			s.push(val)
-			return val
+			return VNil()
 		},
 		"eq?": func(s *Stack, t *Table) VType {
 			a := s.pop()
 			b := s.pop()
 			val := NewVBoolean(a.CompareWith(b) == 0)
 			s.push(val)
-			return val
+			return VNil()
 		},
 
 		// Control flow
