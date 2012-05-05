@@ -35,7 +35,7 @@ func (t *Table) Defined() string {
 	return s
 }
 
-func (t *Table) call(name string, s *Stack) VType {
+func (t *Table) Call(name string, s *Stack) VType {
 	var e VType = VNil()
 	if n, np := t.native[name]; np {
 		_, _, e = Run(&n, s, t)
@@ -43,27 +43,27 @@ func (t *Table) call(name string, s *Stack) VType {
 		e = f(s, t)
 	} else {
 		a, _ := t.aliases[name]
-		return t.call(a, s)
+		return t.Call(a, s)
 	}
 	return e
 }
 
-func (t *Table) has(name string) bool {
+func (t *Table) Has(name string) bool {
 	_, n := t.native[name]
 	_, f := t.functions[name]
 	_, a := t.aliases[name]
 	return n || f || a
 }
 
-func (t *Table) define(name string, f Function) {
+func (t *Table) Define(name string, f Function) {
 	t.functions[name] = f
 }
 
-func (t *Table) defineNative(name string, ts *Tokens) {
+func (t *Table) DefineNative(name string, ts *Tokens) {
 	t.native[name] = *ts
 }
 
-func (t *Table) alias(from, to string) {
+func (t *Table) Alias(from, to string) {
 	t.aliases[from] = to
 }
 

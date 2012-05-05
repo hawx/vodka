@@ -50,7 +50,7 @@ func FullParse(code string) *Tokens {
 			*list = append(*list, NewToken("newline", ""))
 
 		case ';':
-			i, temp = ParseUntil(i, code, '\n')
+			i, temp = parseUntil(i, code, '\n')
 			*list = append(*list, NewToken("comment",
 				strings.TrimSpace(strings.TrimLeft(temp, ";"))))
 
@@ -59,30 +59,30 @@ func FullParse(code string) *Tokens {
 
 		case '\'':
 			i++
-			i, temp = ParseUntil(i, code, '\'')
+			i, temp = parseUntil(i, code, '\'')
 			*list = append(*list, NewToken("str", temp))
 
 		case '"':
 			i++
-			i, temp = ParseUntil(i, code, '"')
+			i, temp = parseUntil(i, code, '"')
 			*list = append(*list, NewToken("str", temp))
 
 		case '[':
 			i++
-			i, temp = ParseMatching(i, code, '[', ']')
+			i, temp = parseMatching(i, code, '[', ']')
 			*list = append(*list, NewToken("stm", temp))
 
 		case ':':
 			i++
-			i, temp = ParseUntilWhitespace(i, code)
+			i, temp = parseUntilWhitespace(i, code)
 			*list = append(*list, NewToken("stm", temp))
 
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			i, temp = ParseUntilWhitespace(i, code)
+			i, temp = parseUntilWhitespace(i, code)
 			*list = append(*list, NewToken("int", temp))
 
 		case '-':
-			i, temp = ParseUntilWhitespace(i, code)
+			i, temp = parseUntilWhitespace(i, code)
 			if temp == "-" {
 				*list = append(*list, NewToken("fun", temp))
 			} else {
@@ -90,7 +90,7 @@ func FullParse(code string) *Tokens {
 			}
 
 		default:
-			i, temp = ParseUntilWhitespace(i, code)
+			i, temp = parseUntilWhitespace(i, code)
 			*list = append(*list, NewToken("fun", temp))
 
 		}
@@ -111,15 +111,15 @@ func Parse(code string) *Tokens {
 	return list
 }
 
-func ParseUntil(idx int, code string, until uint8) (i int, s string) {
-	return ParseUntilAny(idx, code, []uint8{until})
+func parseUntil(idx int, code string, until uint8) (i int, s string) {
+	return parseUntilAny(idx, code, []uint8{until})
 }
 
-func ParseUntilWhitespace(idx int, code string) (i int, s string) {
-	return ParseUntilAny(idx, code, []uint8{' ', '\n', '\t'})
+func parseUntilWhitespace(idx int, code string) (i int, s string) {
+	return parseUntilAny(idx, code, []uint8{' ', '\n', '\t'})
 }
 
-func ParseUntilAny(idx int, code string, untils []uint8) (i int, s string) {
+func parseUntilAny(idx int, code string, untils []uint8) (i int, s string) {
 	str := ""
 
 	for i := idx; i < len(code); i++ {
@@ -134,7 +134,7 @@ func ParseUntilAny(idx int, code string, untils []uint8) (i int, s string) {
 	return len(code), str
 }
 
-func ParseMatching(idx int, code string, op, cl uint8) (i int, s string) {
+func parseMatching(idx int, code string, op, cl uint8) (i int, s string) {
 	str := ""
 
 	for i := idx; i < len(code); i++ {
@@ -142,7 +142,7 @@ func ParseMatching(idx int, code string, op, cl uint8) (i int, s string) {
 		if c == op {
 			i++
 			f := ""
-			i, f = ParseMatching(i, code, op, cl)
+			i, f = parseMatching(i, code, op, cl)
 			str += "[" + f + "]"
 		} else if c == cl {
 			return i, strings.TrimSpace(str)

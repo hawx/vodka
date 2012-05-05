@@ -23,20 +23,20 @@ import (
 
 type Stack []VType
 
-func (k *Stack) size() int {
+func (k *Stack) Size() int {
 	return len(*k)
 }
 
-func (k *Stack) empty() bool {
+func (k *Stack) Empty() bool {
 	return len(*k) == 0
 }
 
-func (k *Stack) push(s VType) {
+func (k *Stack) Push(s VType) {
 	*k = append(*k, s)
 }
 
-func (k *Stack) pop() VType {
-	if k.empty() {
+func (k *Stack) Pop() VType {
+	if k.Empty() {
 		return nil
 	}
 	last := len(*k) - 1
@@ -45,12 +45,12 @@ func (k *Stack) pop() VType {
 	return s
 }
 
-func (k *Stack) popString() *VString {
-	return NewVString(k.pop().String())
+func (k *Stack) PopString() *VString {
+	return NewVString(k.Pop().String())
 }
 
-func (k *Stack) top() VType {
-	if k.empty() {
+func (k *Stack) Top() VType {
+	if k.Empty() {
 		return nil
 	}
 	last := len(*k) - 1
@@ -58,8 +58,8 @@ func (k *Stack) top() VType {
 	return s
 }
 
-func (k *Stack) peek(n int) []VType {
-	if k.size() <= n {
+func (k *Stack) Peek(n int) []VType {
+	if k.Size() <= n {
 		return *k
 	}
 	last := len(*k)
@@ -67,7 +67,7 @@ func (k *Stack) peek(n int) []VType {
 	return s
 }
 
-func (k *Stack) clear() {
+func (k *Stack) Clear() {
 	*k = (*k)[0:0]
 }
 
@@ -85,10 +85,10 @@ func (k Stack) String() string {
 func (k Stack) TruncatedString() string {
 	lim := 7
 	str := "... "
-	if k.size() < lim {
+	if k.Size() < lim {
 		str = "["
 	}
-	for i, elem := range k.peek(lim) {
+	for i, elem := range k.Peek(lim) {
 		if i > 0 {
 			str += " "
 		}

@@ -11,182 +11,182 @@ func BootedTable() *Table {
 	t := map[string]Function{
 
 		"eval": func(s *Stack, t *Table) VType {
-			str := s.pop().Value().(string)
+			str := s.Pop().Value().(string)
 			_, _, v := Eval(str, s, t)
 			return v
 		},
 		"alias": func(s *Stack, t *Table) VType {
-			from := s.pop().Value().(string)
-			to := s.pop().Value().(string)
-			t.alias(from, to)
+			from := s.Pop().Value().(string)
+			to := s.Pop().Value().(string)
+			t.Alias(from, to)
 			return VNil()
 		},
 		"define": func(s *Stack, t *Table) VType {
-			stms := s.pop().Value().(*Tokens)
-			name := s.pop().Value().(string)
-			t.defineNative(name, stms)
+			stms := s.Pop().Value().(*Tokens)
+			name := s.Pop().Value().(string)
+			t.DefineNative(name, stms)
 			return VNil()
 		},
 		"defined": func(s *Stack, t *Table) VType {
 			v := NewVString(t.Defined())
-			s.push(v)
+			s.Push(v)
 			return VNil()
 		},
 		"type": func(s *Stack, t *Table) VType {
-			v := NewVString(s.pop().Type())
-			s.push(v)
+			v := NewVString(s.Pop().Type())
+			s.Push(v)
 			return VNil()
 		},
 
 		// Basic I/O
 
 		"print": func(s *Stack, t *Table) VType {
-			v := s.pop().Value().(string)
+			v := s.Pop().Value().(string)
 			fmt.Println(v)
 			return VNil()
 		},
 		"p": func(s *Stack, t *Table) VType {
-			v := s.popString().String()
+			v := s.PopString().String()
 			fmt.Println(v[1 : len(v)-1])
 			return VNil()
 		},
 		"read": func(s *Stack, t *Table) VType {
-			contents, _ := ioutil.ReadFile(s.pop().Value().(string))
+			contents, _ := ioutil.ReadFile(s.Pop().Value().(string))
 			str := NewVString(string(contents))
-			s.push(str)
+			s.Push(str)
 			return VNil()
 		},
 
 		// Stack operations
 
 		"pop": func(s *Stack, t *Table) VType {
-			v := s.pop()
+			v := s.Pop()
 			return v
 		},
 		"size": func(s *Stack, t *Table) VType {
-			v := NewVIntegerInt(s.size())
-			s.push(v)
+			v := NewVIntegerInt(s.Size())
+			s.Push(v)
 			return VNil()
 		},
 		"dup": func(s *Stack, t *Table) VType {
-			v := s.top()
-			s.push(v)
+			v := s.Top()
+			s.Push(v)
 			return VNil()
 		},
 		"swap": func(s *Stack, t *Table) VType {
-			a := s.pop()
-			b := s.pop()
-			s.push(a)
-			s.push(b)
+			a := s.Pop()
+			b := s.Pop()
+			s.Push(a)
+			s.Push(b)
 			return VNil()
 		},
 		"drop": func(s *Stack, t *Table) VType {
-			s.clear()
+			s.Clear()
 			return VNil()
 		},
 		"compose": func(s *Stack, t *Table) VType {
-			a := s.pop()
-			b := s.pop()
+			a := s.Pop()
+			b := s.Pop()
 			c := NewVBlock(b.(*VBlock).value + " " + a.(*VBlock).value)
-			s.push(c)
+			s.Push(c)
 			return VNil()
 		},
 		"wrap": func(s *Stack, t *Table) VType {
-			b := s.pop()
+			b := s.Pop()
 			r := NewVBlock("[" + b.(*VBlock).value + "]")
-			s.push(r)
+			s.Push(r)
 			return VNil()
 		},
 
 		// Arithmetic operations
 
 		"add": func(s *Stack, t *Table) VType {
-			add := NewVIntegerInt(s.pop().Value().(int) + s.pop().Value().(int))
-			s.push(add)
+			add := NewVIntegerInt(s.Pop().Value().(int) + s.Pop().Value().(int))
+			s.Push(add)
 			return VNil()
 		},
 		"mult": func(s *Stack, t *Table) VType {
-			mult := NewVIntegerInt(s.pop().Value().(int) * s.pop().Value().(int))
-			s.push(mult)
+			mult := NewVIntegerInt(s.Pop().Value().(int) * s.Pop().Value().(int))
+			s.Push(mult)
 			return VNil()
 		},
 		"sub": func(s *Stack, t *Table) VType {
-			a := s.pop().Value().(int)
-			b := s.pop().Value().(int)
+			a := s.Pop().Value().(int)
+			b := s.Pop().Value().(int)
 			sub := NewVIntegerInt(b - a)
-			s.push(sub)
+			s.Push(sub)
 			return VNil()
 		},
 		"div": func(s *Stack, t *Table) VType {
-			a := s.pop().Value().(int)
-			b := s.pop().Value().(int)
+			a := s.Pop().Value().(int)
+			b := s.Pop().Value().(int)
 			div := NewVIntegerInt(b / a)
-			s.push(div)
+			s.Push(div)
 			return VNil()
 		},
 		"neg": func(s *Stack, t *Table) VType {
-			val := NewVIntegerInt(-s.pop().Value().(int))
-			s.push(val)
+			val := NewVIntegerInt(-s.Pop().Value().(int))
+			s.Push(val)
 			return VNil()
 		},
 
 		// Logical
 
 		"true": func(s *Stack, t *Table) VType {
-			s.push(VTrue())
+			s.Push(VTrue())
 			return VNil()
 		},
 		"false": func(s *Stack, t *Table) VType {
-			s.push(VFalse())
+			s.Push(VFalse())
 			return VNil()
 		},
 		"nil": func(s *Stack, t *Table) VType {
-			s.push(VNil())
+			s.Push(VNil())
 			return VNil()
 		},
 
 		"or": func(s *Stack, t *Table) VType {
-			a := s.pop().Value().(bool)
-			b := s.pop().Value().(bool)
+			a := s.Pop().Value().(bool)
+			b := s.Pop().Value().(bool)
 			val := VFalse()
 			if a || b {
 				val = VTrue()
 			}
-			s.push(val)
+			s.Push(val)
 			return VNil()
 		},
 		"and": func(s *Stack, t *Table) VType {
-			a := s.pop().Value().(bool)
-			b := s.pop().Value().(bool)
+			a := s.Pop().Value().(bool)
+			b := s.Pop().Value().(bool)
 			val := VFalse()
 			if a && b {
 				val = VTrue()
 			}
-			s.push(val)
+			s.Push(val)
 			return VNil()
 		},
 
 		"compare": func(s *Stack, t *Table) VType {
-			a := s.pop()
-			b := s.pop()
+			a := s.Pop()
+			b := s.Pop()
 			val := NewVIntegerInt(a.CompareWith(b))
-			s.push(val)
+			s.Push(val)
 			return VNil()
 		},
 		"eq?": func(s *Stack, t *Table) VType {
-			a := s.pop()
-			b := s.pop()
+			a := s.Pop()
+			b := s.Pop()
 			val := NewVBoolean(a.CompareWith(b) == 0)
-			s.push(val)
+			s.Push(val)
 			return VNil()
 		},
 
 		// Control flow
 
 		"if-else": func(s *Stack, t *Table) VType {
-			a := s.pop().Value().(*Tokens)
-			b := s.pop().Value().(*Tokens)
-			cond := s.pop().Value().(bool)
+			a := s.Pop().Value().(*Tokens)
+			b := s.Pop().Value().(*Tokens)
+			cond := s.Pop().Value().(bool)
 			if cond {
 				s, t, _ = Run(a, s, t)
 			} else {
@@ -195,10 +195,10 @@ func BootedTable() *Table {
 			return VNil()
 		},
 		"call": func(s *Stack, t *Table) VType {
-			val := s.top().Value()
+			val := s.Top().Value()
 			switch val.(type) {
 			case *Tokens:
-				s.pop()
+				s.Pop()
 				Run(val.(*Tokens), s, t)
 			case *VBlock:
 				toks := new(Tokens)
@@ -210,36 +210,36 @@ func BootedTable() *Table {
 			return VNil()
 		},
 		"without": func(s *Stack, t *Table) VType {
-			save := s.pop()
+			save := s.Pop()
 			tokens := new(Tokens)
 			*tokens = append(*tokens, NewToken("fun", "call"))
 			Run(tokens, s, t)
-			s.push(save)
+			s.Push(save)
 			return VNil()
 		},
 		"without2": func(s *Stack, t *Table) VType {
-			save1 := s.pop()
-			save2 := s.pop()
+			save1 := s.Pop()
+			save2 := s.Pop()
 			tokens := new(Tokens)
 			*tokens = append(*tokens, NewToken("fun", "call"))
 			Run(tokens, s, t)
-			s.push(save2)
-			s.push(save1)
+			s.Push(save2)
+			s.Push(save1)
 			return VNil()
 		},
 
 		// Strings
 
 		"string": func(s *Stack, t *Table) VType {
-			v := s.popString()
-			s.push(v)
+			v := s.PopString()
+			s.Push(v)
 			return VNil()
 		},
 		"concat": func(s *Stack, t *Table) VType {
-			a := s.pop().Value().(string)
-			b := s.pop().Value().(string)
+			a := s.Pop().Value().(string)
+			b := s.Pop().Value().(string)
 			c := NewVString(b + a)
-			s.push(c)
+			s.Push(c)
 			return VNil()
 		},
 	}
@@ -268,17 +268,17 @@ func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
 	for _, tok := range *tokens {
 		switch tok.key {
 		case "str":
-			stk.push(NewVString(tok.val))
+			stk.Push(NewVString(tok.val))
 
 		case "int":
-			stk.push(NewVInteger(tok.val))
+			stk.Push(NewVInteger(tok.val))
 
 		case "stm":
-			stk.push(NewVBlock(tok.val))
+			stk.Push(NewVBlock(tok.val))
 
 		case "fun":
-			if tbl.has(tok.val) {
-				val = tbl.call(tok.val, stk)
+			if tbl.Has(tok.val) {
+				val = tbl.Call(tok.val, stk)
 			} else {
 				println("Unknown function: '" + tok.val + "'")
 			}
