@@ -52,9 +52,12 @@ func main() {
 	if len(os.Args) > 1 {
 		if os.Args[1] == "doc" {
 			Doc([]string{os.Args[2]}, "doc.html")
+
 		} else {
-			contents, _ := ioutil.ReadFile(os.Args[1])
-			BareEval(string(contents))
+			for _, file := range os.Args[1:] {
+				contents, _ := ioutil.ReadFile(file)
+				BareEval(string(contents))
+			}
 		}
 
 	} else {
