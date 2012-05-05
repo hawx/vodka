@@ -13,6 +13,6 @@ Rainbow.extend('vodka', [
     'pattern': /true|false|nil/g
   }, {
       'name': 'support',
-      'pattern': /:\w+/g
+      'pattern': /:[\S]+/g
   }
 ], true);
