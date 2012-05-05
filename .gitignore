@@ -3,3 +3,4 @@ _obj/
 *.out
 vodka
 doc.html
+rsc/min.js
