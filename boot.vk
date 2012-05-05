@@ -1,6 +1,88 @@
+'__document__' . define
+
+; Evaluates the string at the top of the stack as vodka source code.
+; sig: string ->
+; example: '1 2 +' eval ;=> [3]
+'eval' __document__
+
+; Defines an alias which when used will call the aliased function.
+; sig: string string ->
+; example: 'add' '+' alias
+'alias' __document__
+
+; Defines a new function with the name given, when called the block passed will
+; be called.
+; sig: string block ->
+; example: 'sq' [ dup * ] define
+'define' __document__
+
+; Pushes a string containing all defined functions on to the stack.
+; sig: -> string
+'defined' __document__
+
+; Replaces the element at the top of the stack with a string describing it's
+; type.
+; sig: 'a -> string
+; example: 123 type ;=> ['integer']
+'type' __document__
+
+; Checks whether there are no elements on the stack.
+; sig: -> bool
+'empty?' [
+  size 0 eq?
+] define
+
+; Checks whether the stack contains one or less elements.
+; sig: -> bool
+'small?' [
+  size 1 lte?
+] define
+
+; Checks whether the top element is nil.
+; sig: 'a -> bool
+'nil?'     [ type 'nil'     = ] define
+
+; Checks whether the top element is boolean.
+; sig: 'a -> bool
+'boolean?' [ type 'boolean' = ] define
+
+; Checks whether the top element is a block.
+; sig: 'a -> bool
+'block?'   [ type 'block'   = ] define
+
+; Checks whether the top element is a string.
+; sig: 'a -> bool
+'string?'  [ type 'string'  = ] define
+
+; Checks whether the top element is an integer.
+; sig: 'a -> bool
+'integer?' [ type 'integer' = ] define
+
+; Includes the vodka file at the top of the stack.
+; sig: string ->
+; example: 'test' include ; Will load the file 'test.vk'
 'include' [
   '.vk' concat read eval
 ] define
+
+
+; group: Basic I/O
+
+; Prints the string at the top of the stack to stdout.
+; sig: string ->
+; example: 'Hello world' print ;=> Hello World
+'print' __document__
+
+; Prints the string representation of the element at the top of the stack.
+; sig: 'a ->
+; example: 500 p ;=> 500
+'p' __document__
+
+; Reads the file at the top of the stack.
+; sig: string -> string
+; example: 'lorem.txt' read ;=> ["Lorem ..."]
+'read' __document__
+
 
 ; group: Stack operations
 
@@ -20,10 +102,6 @@
 ; sig: 'a 'b -> 'b 'a
 'swap' __document__
 
-; Swaps the second and third elements on the stack.
-; sig: 'a 'b 'c -> 'b 'a 'c
-'swapp' __document__
-
 ; Removes all elements from the stack.
 ; sig: 'A ->
 'drop' __document__
@@ -32,6 +110,15 @@
 ; sig: block block -> block
 ; example: [ dup dec ] :mult compose ;=> [block:[ dup dec mult ]]
 'compose' __document__
+
+; Wraps the block in another block.
+; sig: block -> ( -> block)
+; example: :inc wrap [[inc]] eq? ;=> [true]
+'wrap' __document__
+
+; Swaps the second and third elements on the stack.
+; sig: 'a 'b 'c -> 'b 'a 'c
+'swapp' [ :swap under ] define
 
 ; Calls the block on the top of the stack for each element on the stack,
 ; should be used with a reductive function.
@@ -117,6 +204,7 @@
   if-else
 ] define
 
+
 ; group: Logical operations
 
 ; Calculates the value of a boolean or operation applied to the top two elements
@@ -149,8 +237,23 @@
   :true :false if-else
 ] define
 
+; Checks whether the top element is greater than the second.
+; sig: 'a 'b -> bool
+; example: 1 2 gt? ;=> [true]
 'gt?'  [ compare  1 eq? ] define
+
+; Checks whether the top element is less than the second.
+; sig: 'a 'b -> bool
+; example: 1 2 lt? ;=> [false]
 'lt?'  [ compare -1 eq? ] define
+
+; Checks whether the top element is not equal to the second. Note: this has a
+; different meaning to `eq? not`. This will return false if the elements are
+; lt? or gt? or eq?. Make sure you understand this properly before using, in
+; most cases you will want to use `eq? not` instead.
+;
+; sig: 'a 'b -> bool
+; example: 'a' 4 neq? ;=> [true]
 'neq?' [ compare -2 eq? ] define
 
 'eq?'  '=' alias
@@ -158,47 +261,20 @@
 'lt?'  '<' alias
 'not'  '!' alias
 
+; Checks whether the top element is less than or equal to the second.
+; sig: 'a 'b -> bool
 'lte?' [
   gt? !
 ] define
 
+; Checks whether the top element is greater than or equal to the second.
+; sig: 'a 'b -> bool
 'gte?' [
   lt? !
 ] define
 
 'lte?' '<=' alias
 'gte?' '>=' alias
-
-
-; group: Reflection
-
-; Pushes a string containing all defined functions on to the stack.
-; sig: -> string
-'defined' __document__
-
-; Replaces the element at the top of the stack with a string describing it's
-; type.
-; sig: 'a -> string
-; example: 123 type ;=> ['int']
-'type' __document__
-
-; Checks whether there are no elements on the stack.
-; sig: -> bool
-'empty?' [
-  size 0 eq?
-] define
-
-; Checks whether the stack contains one or less elements.
-; sig: -> bool
-'small?' [
-  size 1 lte?
-] define
-
-'nil?'     [ type 'nil'     = ] define
-'boolean?' [ type 'boolean' = ] define
-'block?'   [ type 'block'   = ] define
-'string?'  [ type 'string'  = ] define
-'integer?' [ type 'integer' = ] define
 
 
 ; group: Control flow
@@ -220,11 +296,23 @@
 ; example: 5 :dec 'In the way' without ;=> [4 'In the way']
 'without' __document__
 
+; Calls the third element while temporarily removing the top two elements from
+; the stack.
+; sig: ( -> 'A) 'a 'b -> 'A 'a 'b
+'without2' __document__
+
 ; Calls the top element while temporarily removing the second element.
 ; sig: 'a ( -> 'A) -> 'a 'A
 ; example: 5 'In the way' :dec under ;=> [4 'In the way']
 'under' [
   swap without
+] define
+
+; Calls the top element while temporarily removing the second and third
+; elements.
+; sig: 'a 'b ( -> 'A) -> 'a 'b 'A
+'under2' [
+  swap swapp without2
 ] define
 
 ; Evaluates the block at the top of the stack if the value below it is true.
@@ -283,15 +371,15 @@
   pop nil pop
 ] define
 
-; group: Definition
 
-; Defines an alias which when used will call the aliased function.
-; sig: string string ->
-; example: 'add' '+' alias
-'alias' __document__
+; group: Strings
 
-; Defines a new function with the name given, when called the block passed will
-; be called.
-; sig: string block ->
-; example: 'sq' [ dup * ] define
-'define' __document__
+; Converts the element at the top of the stack into a string.
+; sig: 'a -> string
+; example: 5 string ;=> ['5']
+'string' __document__
+
+; Joins the top two strings on the stack forming one string.
+; sig: string string -> string
+; example: 'Hello' ' World' concat ;=> ['Hello World']
+'concat' __document__

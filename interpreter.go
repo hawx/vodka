@@ -10,17 +10,23 @@ func BootedTable() *Table {
 
 	t := map[string]Function{
 
-		"__document__": func(s *Stack, t *Table) VType {
-			return VNil()
-		},
 		"eval": func(s *Stack, t *Table) VType {
 			str := s.pop().Value().(string)
 			_, _, v := Eval(str, s, t)
 			return v
 		},
-
-		// Reflection
-
+		"alias": func(s *Stack, t *Table) VType {
+			from := s.pop().Value().(string)
+			to := s.pop().Value().(string)
+			t.alias(from, to)
+			return VNil()
+		},
+		"define": func(s *Stack, t *Table) VType {
+			stms := s.pop().Value().(*Tokens)
+			name := s.pop().Value().(string)
+			t.defineNative(name, stms)
+			return VNil()
+		},
 		"defined": func(s *Stack, t *Table) VType {
 			v := NewVString(t.Defined())
 			s.push(v)
@@ -29,21 +35,6 @@ func BootedTable() *Table {
 		"type": func(s *Stack, t *Table) VType {
 			v := NewVString(s.pop().Type())
 			s.push(v)
-			return VNil()
-		},
-
-		// Type conversion
-
-		"string": func(s *Stack, t *Table) VType {
-			v := s.popString()
-			s.push(v)
-			return VNil()
-		},
-		"concat": func(s *Stack, t *Table) VType {
-			a := s.pop().Value().(string)
-			b := s.pop().Value().(string)
-			c := NewVString(b + a)
-			s.push(c)
 			return VNil()
 		},
 
@@ -87,15 +78,6 @@ func BootedTable() *Table {
 			b := s.pop()
 			s.push(a)
 			s.push(b)
-			return VNil()
-		},
-		"swapp": func(s *Stack, t *Table) VType {
-			a := s.pop()
-			b := s.pop()
-			c := s.pop()
-			s.push(b)
-			s.push(c)
-			s.push(a)
 			return VNil()
 		},
 		"drop": func(s *Stack, t *Table) VType {
@@ -246,19 +228,18 @@ func BootedTable() *Table {
 			return VNil()
 		},
 
+		// Strings
 
-		// Definition
-
-		"alias": func(s *Stack, t *Table) VType {
-			from := s.pop().Value().(string)
-			to := s.pop().Value().(string)
-			t.alias(from, to)
+		"string": func(s *Stack, t *Table) VType {
+			v := s.popString()
+			s.push(v)
 			return VNil()
 		},
-		"define": func(s *Stack, t *Table) VType {
-			stms := s.pop().Value().(*Tokens)
-			name := s.pop().Value().(string)
-			t.defineNative(name, stms)
+		"concat": func(s *Stack, t *Table) VType {
+			a := s.pop().Value().(string)
+			b := s.pop().Value().(string)
+			c := NewVString(b + a)
+			s.push(c)
 			return VNil()
 		},
 	}
