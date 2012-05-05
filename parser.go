@@ -8,6 +8,7 @@ package main
 
 import (
 	"strings"
+	"regexp"
 )
 
 type Tokens []Token
@@ -83,10 +84,12 @@ func FullParse(code string) *Tokens {
 
 		case '-':
 			i, temp = parseUntilWhitespace(i, code)
-			if temp == "-" {
-				*list = append(*list, NewToken("fun", temp))
-			} else {
+			matcher, _ := regexp.Compile("-[0-9]+")
+
+			if matcher.MatchString(temp) {
 				*list = append(*list, NewToken("int", temp))
+			} else {
+				*list = append(*list, NewToken("fun", temp))
 			}
 
 		default:
