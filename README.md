@@ -37,7 +37,6 @@ order,
 ``` bash
 >> "Hello world!"
 ["Hello world!"] => nil
->>
 ```
 
 ### Integers
@@ -45,7 +44,6 @@ order,
 ``` bash
 >> 5 6 1000
 [5 6 1000] => nil
->>
 ```
 
 ### Boolean & Nil
@@ -53,14 +51,20 @@ order,
 ``` bash
 >> true false nil
 [true false nil] => nil
->>
+```
+
+### Lists
+
+``` bash
+>> ('a' 'b' 'c')
+[('a' 'b' 'c')] => nil
 ```
 
 ### Blocks
 
 ``` bash
 >> [ dup * ]
-[block:[dup *]] => nil
+[[ dup * ]] => nil
 ```
 
 And we're done. So how about a slightly useful calculation showing some features
