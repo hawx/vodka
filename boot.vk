@@ -108,7 +108,7 @@
 
 ; Composes the two blocks at the top of the stack, forming one single block.
 ; sig: block block -> block
-; example: [ dup dec ] :mult compose ;=> [block:[ dup dec mult ]]
+; example: [ dup dec ] :mult compose ;=> [[ dup dec mult ]]
 'compose' __document__
 
 ; Wraps the block in another block.
@@ -383,6 +383,13 @@
 ; sig: string string -> string
 ; example: 'Hello' ' World' concat ;=> ['Hello World']
 'concat' __document__
+
+; Joins all strings in a list together using the string at the top.
+; sig: list string -> string
+; example: ('John' 'Dave' 'Luke') ', ' join ;=> ['John, Dave, Luke']
+'join' [
+  wrap [ swap concat concat ] compose reduce
+] define
 
 
 ; group: Lists

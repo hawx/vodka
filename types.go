@@ -93,7 +93,7 @@ type VBlock struct {
 }
 
 func (v *VBlock) String() string {
-	return "block:[ " + v.value + " ]"
+	return "[ " + v.value + " ]"
 }
 
 func (v *VBlock) Value() interface{} {

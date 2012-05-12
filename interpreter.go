@@ -93,7 +93,7 @@ func BootedTable() *Table {
 		},
 		"wrap": func(s *Stack, t *Table) VType {
 			b := s.Pop()
-			r := NewVBlock("[" + b.(*VBlock).value + "]")
+			r := NewVBlock(b.String())
 			s.Push(r)
 			return VNil()
 		},
