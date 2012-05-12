@@ -242,6 +242,65 @@ func BootedTable() *Table {
 			s.Push(c)
 			return VNil()
 		},
+
+		// Lists
+
+		"head": func(s *Stack, t *Table) VType {
+			h := s.Pop().Value().([]VType)[0]
+			s.Push(h)
+			return VNil()
+		},
+		"tail": func(s *Stack, t *Table) VType {
+			v := s.Pop().Value().([]VType)[1:]
+			s.Push(NewVListList(v))
+			return VNil()
+		},
+		"cons": func(s *Stack, t *Table) VType {
+			v := s.Pop().(VType)
+			l := s.Pop().Value().([]VType)
+			l = append(l, v)
+			s.Push(NewVListList(l))
+			return VNil()
+		},
+		"append": func(s *Stack, t *Table) VType {
+			a := s.Pop().Value().([]VType)
+			b := s.Pop().Value().([]VType)
+
+			// Ripped from http://golang.org/doc/effective_go.html#slices
+			l := len(a)
+			if l + len(b) > cap(a) {
+				// Allocate double what's needed, for future growth.
+				newSlice := make([]VType, (l + len(b)) * 2)
+				copy(newSlice, a)
+				a = newSlice
+			}
+			a = a[0:l+len(b)]
+			for i, c := range b {
+				a[l+i] = c
+			}
+
+			s.Push(NewVListList(a))
+			return VNil()
+		},
+		"apply": func(s *Stack, t *Table) VType {
+			f := s.Pop().Value().(*Tokens)
+			l := s.Pop().Value().([]VType)
+
+			stk := make(Stack, len(l))
+			for i, o := range l {
+				stk[i] = o.(VType)
+			}
+
+			newstk, _, v := Run(f, &stk, t)
+
+			list := make([]VType, len(*newstk))
+			for i, o := range *newstk {
+				list[i] = o.(VType)
+			}
+			s.Push(NewVListList(list))
+
+			return v
+		},
 	}
 
 	tbl.functions = t
@@ -272,6 +331,12 @@ func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
 
 		case "int":
 			stk.Push(NewVInteger(tok.val))
+
+		case "list":
+			// TODO: need to make sure you can't add to ^tbl^ from a list.
+			sub := NewStack()
+			sub, _, _ = Eval(tok.val, sub, tbl)
+			stk.Push(NewVList(sub))
 
 		case "stm":
 			stk.Push(NewVBlock(tok.val))

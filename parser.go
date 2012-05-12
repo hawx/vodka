@@ -76,6 +76,11 @@ func FullParse(code string) *Tokens {
 			i, temp = parseUntil(i, code, '"')
 			list.AddToken("str", temp)
 
+		case '(':
+			i++
+			i, temp = parseMatching(i, code, '(', ')')
+			list.AddToken("list", temp)
+
 		case '[':
 			i++
 			i, temp = parseMatching(i, code, '[', ']')

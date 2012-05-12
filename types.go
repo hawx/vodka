@@ -198,3 +198,44 @@ func NewVIntegerInt(i int) *VInteger {
 	r.value = i
 	return r
 }
+
+// List ------------------------------------------------------
+
+type VList struct {
+	value []VType
+}
+
+func (v *VList) String() string {
+	s := "("
+	for i, item := range v.value {
+		if i > 0 {
+			s += " "
+		}
+		s += item.String()
+	}
+	return s + ")"
+}
+
+func (v *VList) Value() interface{} {
+	return v.value
+}
+
+func (v *VList) Type() string {
+	return "list"
+}
+
+func (v *VList) CompareWith(other VType) int {
+	return -2
+}
+
+func NewVList(stk *Stack) *VList {
+	r := new(VList)
+	r.value = *stk
+	return r
+}
+
+func NewVListList(list []VType) *VList {
+	r := new(VList)
+	r.value = list
+	return r
+}
