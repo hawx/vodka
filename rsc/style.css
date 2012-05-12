@@ -175,5 +175,6 @@ code .support {
     .docs {
         float: left;
         margin-left: 13em;
+        margin-bottom: 5em;
     }
 }
