@@ -332,6 +332,17 @@ func BootedTable() *Table {
 
 			return v
 		},
+		"reverse": func(s *Stack, t *Table) VType {
+			l := s.Pop().Value().([]VType)
+
+			for i, j := 0, len(l)-1; i < j; i, j = i+1, j-1 {
+				l[i], l[j] = l[j], l[i]
+			}
+
+			s.Push(NewVListList(l))
+
+			return VNil()
+		},
 	}
 
 	tbl.functions = t
