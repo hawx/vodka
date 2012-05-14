@@ -66,6 +66,32 @@
 ] define
 
 
+; group: Types
+
+; Replaces the string at the top of the stack with an integer of the value
+; represented by the string.
+; sig: string -> int
+; example: '5' integer ;=> [5]
+'integer' __document__
+
+; Converts the element at the top of the stack into a string.
+; sig: 'a -> string
+; example: 5 string ;=> ['5']
+'string' __document__
+
+; Replaces the element at the top of the stack with a list containing the
+; element.
+; sig: 'a -> list
+; example: 5 list ;=> [(5)]
+'list' __document__
+
+; Creates a list with all the numbers from the second element to the top
+; element.
+; sig: int int -> list
+; example: 1 5 range ;=> [(1 2 3 4 5)]
+'range' __document__
+
+
 ; group: Basic I/O
 
 ; Prints the string at the top of the stack to stdout.

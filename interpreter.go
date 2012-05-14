@@ -38,6 +38,42 @@ func BootedTable() *Table {
 			return VNil()
 		},
 
+
+		// Types
+
+		"integer": func(s *Stack, t *Table) VType {
+			v := s.Pop().Value().(string)
+			s.Push(NewVInteger(v))
+			return VNil()
+		},
+		"string": func(s *Stack, t *Table) VType {
+			v := s.PopString()
+			s.Push(v)
+			return VNil()
+		},
+		"list": func(s *Stack, t *Table) VType {
+			v := s.Pop()
+			list := make([]VType, 1)
+			list[0] = v
+
+			s.Push(NewVListList(list))
+
+			return VNil()
+		},
+		"range": func(s *Stack, t *Table) VType {
+			end   := s.Pop().Value().(int)
+			start := s.Pop().Value().(int)
+
+			list := make([]VType, end - start + 1)
+			for i := start; i <= end; i++ {
+				list[i-start] = NewVIntegerInt(i)
+			}
+			s.Push(NewVListList(list))
+
+			return VNil()
+		},
+
+
 		// Basic I/O
 
 		"print": func(s *Stack, t *Table) VType {
@@ -230,11 +266,6 @@ func BootedTable() *Table {
 
 		// Strings
 
-		"string": func(s *Stack, t *Table) VType {
-			v := s.PopString()
-			s.Push(v)
-			return VNil()
-		},
 		"concat": func(s *Stack, t *Table) VType {
 			a := s.Pop().Value().(string)
 			b := s.Pop().Value().(string)
