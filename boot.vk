@@ -142,6 +142,10 @@
 ; example: :inc wrap [[inc]] eq? ;=> [true]
 'wrap' __document__
 
+; Duplicates the top two elements of the stack.
+; sig: 'a 'b -> 'a 'b 'a 'b
+'dup2' [ swap dup swapp swap dup swapp ] define
+
 ; Swaps the second and third elements on the stack.
 ; sig: 'a 'b 'c -> 'b 'a 'c
 'swapp' [ :swap under ] define
