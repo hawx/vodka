@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	p "./parser"
 )
 
 func BootedTable() *Table {
@@ -22,7 +23,7 @@ func BootedTable() *Table {
 			return VNil()
 		},
 		"define": func(s *Stack, t *Table) VType {
-			stms := s.Pop().Value().(*Tokens)
+			stms := s.Pop().Value().(*p.Tokens)
 			name := s.Pop().Value().(string)
 			t.DefineNative(name, stms)
 			return VNil()
@@ -205,14 +206,14 @@ func BootedTable() *Table {
 		"compare": func(s *Stack, t *Table) VType {
 			a := s.Pop()
 			b := s.Pop()
-			val := NewVIntegerInt(a.CompareWith(b))
+			val := NewVIntegerInt(a.Compare(b))
 			s.Push(val)
 			return VNil()
 		},
 		"eq?": func(s *Stack, t *Table) VType {
 			a := s.Pop()
 			b := s.Pop()
-			val := NewVBoolean(a.CompareWith(b) == 0)
+			val := NewVBoolean(a.Compare(b) == 0)
 			s.Push(val)
 			return VNil()
 		},
@@ -220,8 +221,8 @@ func BootedTable() *Table {
 		// Control flow
 
 		"if-else": func(s *Stack, t *Table) VType {
-			a := s.Pop().Value().(*Tokens)
-			b := s.Pop().Value().(*Tokens)
+			a := s.Pop().Value().(*p.Tokens)
+			b := s.Pop().Value().(*p.Tokens)
 			cond := s.Pop().Value().(bool)
 			if cond {
 				s, t, _ = Run(a, s, t)
@@ -233,12 +234,12 @@ func BootedTable() *Table {
 		"call": func(s *Stack, t *Table) VType {
 			val := s.Top().Value()
 			switch val.(type) {
-			case *Tokens:
+			case *p.Tokens:
 				s.Pop()
-				Run(val.(*Tokens), s, t)
+				Run(val.(*p.Tokens), s, t)
 			case *VBlock:
-				toks := new(Tokens)
-				*toks = append(*toks, NewToken("fun", "call"))
+				toks := new(p.Tokens)
+				*toks = append(*toks, p.Token{"fun", "call"})
 				Run(toks, s, t)
 			default:
 				println("Unexpected type")
@@ -247,8 +248,8 @@ func BootedTable() *Table {
 		},
 		"without": func(s *Stack, t *Table) VType {
 			save := s.Pop()
-			tokens := new(Tokens)
-			*tokens = append(*tokens, NewToken("fun", "call"))
+			tokens := new(p.Tokens)
+			*tokens = append(*tokens, p.Token{"fun", "call"})
 			Run(tokens, s, t)
 			s.Push(save)
 			return VNil()
@@ -256,8 +257,8 @@ func BootedTable() *Table {
 		"without2": func(s *Stack, t *Table) VType {
 			save1 := s.Pop()
 			save2 := s.Pop()
-			tokens := new(Tokens)
-			*tokens = append(*tokens, NewToken("fun", "call"))
+			tokens := new(p.Tokens)
+			*tokens = append(*tokens, p.Token{"fun", "call"})
 			Run(tokens, s, t)
 			s.Push(save2)
 			s.Push(save1)
@@ -314,7 +315,7 @@ func BootedTable() *Table {
 			return VNil()
 		},
 		"apply": func(s *Stack, t *Table) VType {
-			f := s.Pop().Value().(*Tokens)
+			f := s.Pop().Value().(*p.Tokens)
 			l := s.Pop().Value().([]VType)
 
 			stk := make(Stack, len(l))
@@ -354,40 +355,40 @@ func BootedTable() *Table {
 }
 
 func BareEval(code string) {
-	tokens := Parse(code)
+	tokens := p.Parse(code)
 	Run(tokens, NewStack(), BootedTable())
 }
 
 func Eval(code string, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
-	tokens := Parse(code)
+	tokens := p.Parse(code)
 	return Run(tokens, stk, tbl)
 }
 
-func Run(tokens *Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
+func Run(tokens *p.Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
 	var val VType = VNil()
 
 	for _, tok := range *tokens {
-		switch tok.key {
+		switch tok.Key {
 		case "str":
-			stk.Push(NewVString(tok.val))
+			stk.Push(NewVString(tok.Val))
 
 		case "int":
-			stk.Push(NewVInteger(tok.val))
+			stk.Push(NewVInteger(tok.Val))
 
 		case "list":
 			// TODO: need to make sure you can't add to ^tbl^ from a list.
 			sub := NewStack()
-			sub, _, _ = Eval(tok.val, sub, tbl)
+			sub, _, _ = Eval(tok.Val, sub, tbl)
 			stk.Push(NewVList(sub))
 
 		case "stm":
-			stk.Push(NewVBlock(tok.val))
+			stk.Push(NewVBlock(tok.Val))
 
 		case "fun":
-			if tbl.Has(tok.val) {
-				val = tbl.Call(tok.val, stk)
+			if tbl.Has(tok.Val) {
+				val = tbl.Call(tok.Val, stk)
 			} else {
-				println("Unknown function: '" + tok.val + "'")
+				println("Unknown function: '" + tok.Val + "'")
 			}
 
 		default:

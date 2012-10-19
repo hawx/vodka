@@ -3,15 +3,21 @@ package main
 import (
 	"strconv"
 	"strings"
+	p "./parser"
 )
 
 // TYPES --------------------------------------------
 
 type VType interface {
-	String() string
-	Value() interface{}
-	Type() string
-	CompareWith(VType) int
+	// Returns the value as a string
+	String()       string
+	// Returns the value
+	Value()        interface{}
+	// Returns the name of the type as a string
+	Type()         string
+	// Compares the value with another, -1, 0, 1 being less, equal and greater. -2
+	// can be used to show not equal, but not less or greater.
+	Compare(VType) int
 }
 
 // SPECIALS ---------------------------------------------
@@ -30,7 +36,7 @@ func (v *VNilType) Type() string {
 	return "nil"
 }
 
-func (v *VNilType) CompareWith(other VType) int {
+func (v *VNilType) Compare(other VType) int {
 	if _, same := (other).(*VNilType); same {
 		return 0
 	}
@@ -63,7 +69,7 @@ func (v *VBoolean) Type() string {
 	return "boolean"
 }
 
-func (v VBoolean) CompareWith(other VType) int {
+func (v VBoolean) Compare(other VType) int {
 	if val, same := other.(*VBoolean); same {
 		if val.value == v.value {
 			return 0
@@ -97,14 +103,14 @@ func (v *VBlock) String() string {
 }
 
 func (v *VBlock) Value() interface{} {
-	return Parse(v.value)
+	return p.Parse(v.value)
 }
 
 func (v *VBlock) Type() string {
 	return "block"
 }
 
-func (v *VBlock) CompareWith(other VType) int {
+func (v *VBlock) Compare(other VType) int {
 	if val, same := other.(*VBlock); same {
 		if val.value == v.value {
 			return 0
@@ -137,7 +143,7 @@ func (v *VString) Type() string {
 	return "string"
 }
 
-func (v *VString) CompareWith(other VType) int {
+func (v *VString) Compare(other VType) int {
 	if val, same := other.(*VString); same {
 		if val.value == v.value {
 			return 0
@@ -174,7 +180,7 @@ func (v *VInteger) Type() string {
 	return "integer"
 }
 
-func (v *VInteger) CompareWith(other VType) int {
+func (v *VInteger) Compare(other VType) int {
 	if val, same := other.(*VInteger); same {
 		if val.value == v.value {
 			return 0
@@ -224,7 +230,7 @@ func (v *VList) Type() string {
 	return "list"
 }
 
-func (v *VList) CompareWith(other VType) int {
+func (v *VList) Compare(other VType) int {
 	return -2
 }
 

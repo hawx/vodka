@@ -4,6 +4,7 @@ import (
 	"strings"
 	"regexp"
 	"io/ioutil"
+	"./parser"
 	"github.com/hoisie/mustache"
 	"sort"
 )
@@ -118,7 +119,7 @@ func Doc(input []string, output string) {
 
 	for _, file := range input {
 	  contents, _ := ioutil.ReadFile(file)
-		list := FullParse(string(contents))
+		list := parser.FullParse(string(contents))
 		docs := split(*list)
 
 		groupDatas := map[string]GroupData{}
@@ -162,26 +163,26 @@ func Doc(input []string, output string) {
 //
 //   comment(s) string "__document__"
 //
-func split(list Tokens) []FunctionDoc {
+func split(list parser.Tokens) []FunctionDoc {
 	docs := []FunctionDoc{}
 	group := ""
 
 	for i := 0; i < len(list); i++ {
-		if list[i].key == "comment" {
-			if strings.HasPrefix(list[i].val, "group: ") {
-				group = list[i].val[7:]
+		if list[i].Key == "comment" {
+			if strings.HasPrefix(list[i].Val, "group: ") {
+				group = list[i].Val[7:]
 
 			} else {
 				idx, doc := collectComments(list, i)
 				i = idx
 				// note that i has been changed by collectComments
-				if list[i].key == "str" {
-					name := list[i].val
+				if list[i].Key == "str" {
+					name := list[i].Val
 					i++
-					if list[i].key == "stm" {
-						docs = append(docs, FunctionDoc{name, doc, list[i].val, group})
+					if list[i].Key == "stm" {
+						docs = append(docs, FunctionDoc{name, doc, list[i].Val, group})
 
-					} else if list[i].key == "fun" && list[i].val == "__document__" {
+					} else if list[i].Key == "fun" && list[i].Val == "__document__" {
 						docs = append(docs, FunctionDoc{name, doc, "", group})
 					}
 				}
@@ -192,11 +193,11 @@ func split(list Tokens) []FunctionDoc {
 	return docs
 }
 
-func collectComments(list Tokens, idx int) (int, string) {
+func collectComments(list parser.Tokens, idx int) (int, string) {
 	doc := ""
 	for i := idx; i < len(list); i++ {
-		if list[i].key == "comment" {
-			doc += strings.TrimSpace(list[i].val) + " \n"
+		if list[i].Key == "comment" {
+			doc += strings.TrimSpace(list[i].Val) + " \n"
 		} else {
 			return i, doc
 		}

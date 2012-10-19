@@ -1,8 +1,12 @@
 package main
 
+import (
+	p "./parser"
+)
+
 type Function func(*Stack, *Table) VType
 type Table struct {
-	native    map[string]Tokens
+	native    map[string]p.Tokens
 	functions map[string]Function
 	aliases   map[string]string
 }
@@ -59,7 +63,7 @@ func (t *Table) Define(name string, f Function) {
 	t.functions[name] = f
 }
 
-func (t *Table) DefineNative(name string, ts *Tokens) {
+func (t *Table) DefineNative(name string, ts *p.Tokens) {
 	t.native[name] = *ts
 }
 
@@ -70,7 +74,7 @@ func (t *Table) Alias(from, to string) {
 func NewTable() *Table {
 	tbl := new(Table)
 
-	n := map[string]Tokens{}
+	n := map[string]p.Tokens{}
 	tbl.native = n
 
 	f := map[string]Function{}
