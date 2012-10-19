@@ -44,36 +44,32 @@ Should be able to
     {'a' -> 1, 'b' -> 2} 'a' get         ;=> 1
 
 
-# Better list implementation
+# Some kind of type system
 
-Maybe based on a gap list?
+I don't really like type systems that much, but an optional type system could be
+useful. And it shouldn't be too difficult to infer types since it is pretty
+simple for a stack.
 
+I also need some kind of polymorphic/multi-dispatch system, for instance
 
-# Fluid Number Type
+    'add5' [
+      5 +
+    ] Number define-for
 
-Number should be a generic wrapper for; integer, quotient and float/bignum
-(undecided which to use at moment) and complex. So I can do
+    'add5' [
+      '5' concat
+    ] String define-for
 
-    2            ; integer
-    2/3          ; quotient
-    2.3          ; real
-    c(2 3i)      ; complex
+    'add5' [
+      5 cons
+    ] List define-for
 
-    2 2/3 +      ;=> 8/3
-    2 2.3 +      ;=> 4.3
-    c(2 3i) 5 +  ;=> c(7 3i)
+Or even nicer
 
-I should be able to use very large numbers
+    'add5' [
+      [ 5 + ]
+      [ 5 'concat' ]
+      [ 5 'cons' ]
+    ] multi-define
 
-    ; googol
-    100 10 ^        ;=> 100000000000000000...
-    ; googolplex
-    100 10 ^ 10 ^   ;=> Infinity
-
-    ; scientific notation
-    10e100          ;=> 100000000000000000...
-
-    ; zero over zero
-    0 0 /           ;=> NaN
-
-These won't be no IEEEE complient numbers!
+And use type inference on the stack and functions to determine which to use.
