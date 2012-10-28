@@ -6,6 +6,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"./stack"
+	"./types"
+	"./types/vnil"
 )
 
 func toString(bytes []uint8) string {
@@ -62,7 +66,7 @@ func main() {
 
 	} else {
 		fmt.Println("Vodka REPL, CTRL+C or type 'quit' to quit")
-		stk := NewStack()
+		stk := stack.New()
 		tbl := BootedTable()
 
 		for {
@@ -76,7 +80,7 @@ func main() {
 			line = completePair(line, "'")
 			line = completePair(line, "\"")
 
-			var e VType = VNil()
+			var e types.VType = vnil.New()
 			stk, tbl, e = Eval(line, stk, tbl)
 			fmt.Printf("%s => %s\n", stk.TruncatedString(), e.String())
 		}

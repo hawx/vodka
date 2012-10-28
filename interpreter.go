@@ -4,6 +4,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	p "./parser"
+
+	"./stack"
+
+	"./types"
+	"./types/vblock"
+	"./types/vboolean"
+	"./types/vnil"
+	"./types/vstring"
+	"./types/vinteger"
+	"./types/vlist"
 )
 
 func BootedTable() *Table {
@@ -11,216 +21,216 @@ func BootedTable() *Table {
 
 	t := map[string]Function{
 
-		"eval": func(s *Stack, t *Table) VType {
+		"eval": func(s *stack.Stack, t *Table) types.VType {
 			str := s.Pop().Value().(string)
 			_, _, v := Eval(str, s, t)
 			return v
 		},
-		"alias": func(s *Stack, t *Table) VType {
+		"alias": func(s *stack.Stack, t *Table) types.VType {
 			from := s.Pop().Value().(string)
 			to := s.Pop().Value().(string)
 			t.Alias(from, to)
-			return VNil()
+			return vnil.New()
 		},
-		"define": func(s *Stack, t *Table) VType {
+		"define": func(s *stack.Stack, t *Table) types.VType {
 			stms := s.Pop().Value().(*p.Tokens)
 			name := s.Pop().Value().(string)
 			t.DefineNative(name, stms)
-			return VNil()
+			return vnil.New()
 		},
-		"defined": func(s *Stack, t *Table) VType {
-			v := NewVString(t.Defined())
+		"defined": func(s *stack.Stack, t *Table) types.VType {
+			v := vstring.New(t.Defined())
 			s.Push(v)
-			return VNil()
+			return vnil.New()
 		},
-		"type": func(s *Stack, t *Table) VType {
-			v := NewVString(s.Pop().Type())
+		"type": func(s *stack.Stack, t *Table) types.VType {
+			v := vstring.New(s.Pop().Type())
 			s.Push(v)
-			return VNil()
+			return vnil.New()
 		},
 
 
 		// Types
 
-		"integer": func(s *Stack, t *Table) VType {
+		"integer": func(s *stack.Stack, t *Table) types.VType {
 			v := s.Pop().Value().(string)
-			s.Push(NewVInteger(v))
-			return VNil()
+			s.Push(vinteger.New(v))
+			return vnil.New()
 		},
-		"string": func(s *Stack, t *Table) VType {
+		"string": func(s *stack.Stack, t *Table) types.VType {
 			v := s.PopString()
 			s.Push(v)
-			return VNil()
+			return vnil.New()
 		},
-		"list": func(s *Stack, t *Table) VType {
+		"list": func(s *stack.Stack, t *Table) types.VType {
 			v := s.Pop()
-			list := make([]VType, 1)
+			list := make([]types.VType, 1)
 			list[0] = v
 
-			s.Push(NewVListList(list))
+			s.Push(vlist.NewFromList(list))
 
-			return VNil()
+			return vnil.New()
 		},
-		"range": func(s *Stack, t *Table) VType {
+		"range": func(s *stack.Stack, t *Table) types.VType {
 			end   := s.Pop().Value().(int)
 			start := s.Pop().Value().(int)
 
-			list := make([]VType, end - start + 1)
+			list := make([]types.VType, end - start + 1)
 			for i := start; i <= end; i++ {
-				list[i-start] = NewVIntegerInt(i)
+				list[i-start] = vinteger.NewFromInt(i)
 			}
-			s.Push(NewVListList(list))
+			s.Push(vlist.NewFromList(list))
 
-			return VNil()
+			return vnil.New()
 		},
 
 
 		// Basic I/O
 
-		"print": func(s *Stack, t *Table) VType {
+		"print": func(s *stack.Stack, t *Table) types.VType {
 			v := s.Pop().Value().(string)
 			fmt.Println(v)
-			return VNil()
+			return vnil.New()
 		},
-		"p": func(s *Stack, t *Table) VType {
+		"p": func(s *stack.Stack, t *Table) types.VType {
 			v := s.PopString().String()
 			fmt.Println(v[1 : len(v)-1])
-			return VNil()
+			return vnil.New()
 		},
-		"read": func(s *Stack, t *Table) VType {
+		"read": func(s *stack.Stack, t *Table) types.VType {
 			contents, _ := ioutil.ReadFile(s.Pop().Value().(string))
-			str := NewVString(string(contents))
+			str := vstring.New(string(contents))
 			s.Push(str)
-			return VNil()
+			return vnil.New()
 		},
 
-		// Stack operations
+		// s.Stack operations
 
-		"pop": func(s *Stack, t *Table) VType {
+		"pop": func(s *stack.Stack, t *Table) types.VType {
 			v := s.Pop()
 			return v
 		},
-		"size": func(s *Stack, t *Table) VType {
-			v := NewVIntegerInt(s.Size())
+		"size": func(s *stack.Stack, t *Table) types.VType {
+			v := vinteger.NewFromInt(s.Size())
 			s.Push(v)
-			return VNil()
+			return vnil.New()
 		},
-		"dup": func(s *Stack, t *Table) VType {
+		"dup": func(s *stack.Stack, t *Table) types.VType {
 			v := s.Top()
 			s.Push(v)
-			return VNil()
+			return vnil.New()
 		},
-		"swap": func(s *Stack, t *Table) VType {
+		"swap": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop()
 			b := s.Pop()
 			s.Push(a)
 			s.Push(b)
-			return VNil()
+			return vnil.New()
 		},
-		"drop": func(s *Stack, t *Table) VType {
+		"drop": func(s *stack.Stack, t *Table) types.VType {
 			s.Clear()
-			return VNil()
+			return vnil.New()
 		},
-		"compose": func(s *Stack, t *Table) VType {
+		"compose": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop()
 			b := s.Pop()
-			c := NewVBlock(b.(*VBlock).value + " " + a.(*VBlock).value)
+			c := vblock.New(b.(*vblock.VBlock).BareValue() + " " + a.(*vblock.VBlock).BareValue())
 			s.Push(c)
-			return VNil()
+			return vnil.New()
 		},
-		"wrap": func(s *Stack, t *Table) VType {
+		"wrap": func(s *stack.Stack, t *Table) types.VType {
 			b := s.Pop()
-			r := NewVBlock(b.String())
+			r := vblock.New(b.String())
 			s.Push(r)
-			return VNil()
+			return vnil.New()
 		},
 
 		// Arithmetic operations
 
-		"add": func(s *Stack, t *Table) VType {
-			add := NewVIntegerInt(s.Pop().Value().(int) + s.Pop().Value().(int))
+		"add": func(s *stack.Stack, t *Table) types.VType {
+			add := vinteger.NewFromInt(s.Pop().Value().(int) + s.Pop().Value().(int))
 			s.Push(add)
-			return VNil()
+			return vnil.New()
 		},
-		"mult": func(s *Stack, t *Table) VType {
-			mult := NewVIntegerInt(s.Pop().Value().(int) * s.Pop().Value().(int))
+		"mult": func(s *stack.Stack, t *Table) types.VType {
+			mult := vinteger.NewFromInt(s.Pop().Value().(int) * s.Pop().Value().(int))
 			s.Push(mult)
-			return VNil()
+			return vnil.New()
 		},
-		"sub": func(s *Stack, t *Table) VType {
+		"sub": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop().Value().(int)
 			b := s.Pop().Value().(int)
-			sub := NewVIntegerInt(b - a)
+			sub := vinteger.NewFromInt(b - a)
 			s.Push(sub)
-			return VNil()
+			return vnil.New()
 		},
-		"div": func(s *Stack, t *Table) VType {
+		"div": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop().Value().(int)
 			b := s.Pop().Value().(int)
-			div := NewVIntegerInt(b / a)
+			div := vinteger.NewFromInt(b / a)
 			s.Push(div)
-			return VNil()
+			return vnil.New()
 		},
-		"neg": func(s *Stack, t *Table) VType {
-			val := NewVIntegerInt(-s.Pop().Value().(int))
+		"neg": func(s *stack.Stack, t *Table) types.VType {
+			val := vinteger.NewFromInt(-s.Pop().Value().(int))
 			s.Push(val)
-			return VNil()
+			return vnil.New()
 		},
 
 		// Logical
 
-		"true": func(s *Stack, t *Table) VType {
-			s.Push(VTrue())
-			return VNil()
+		"true": func(s *stack.Stack, t *Table) types.VType {
+			s.Push(vboolean.True())
+			return vnil.New()
 		},
-		"false": func(s *Stack, t *Table) VType {
-			s.Push(VFalse())
-			return VNil()
+		"false": func(s *stack.Stack, t *Table) types.VType {
+			s.Push(vboolean.False())
+			return vnil.New()
 		},
-		"nil": func(s *Stack, t *Table) VType {
-			s.Push(VNil())
-			return VNil()
+		"nil": func(s *stack.Stack, t *Table) types.VType {
+			s.Push(vnil.New())
+			return vnil.New()
 		},
 
-		"or": func(s *Stack, t *Table) VType {
+		"or": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop().Value().(bool)
 			b := s.Pop().Value().(bool)
-			val := VFalse()
+			val := vboolean.False()
 			if a || b {
-				val = VTrue()
+				val = vboolean.True()
 			}
 			s.Push(val)
-			return VNil()
+			return vnil.New()
 		},
-		"and": func(s *Stack, t *Table) VType {
+		"and": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop().Value().(bool)
 			b := s.Pop().Value().(bool)
-			val := VFalse()
+			val := vboolean.False()
 			if a && b {
-				val = VTrue()
+				val = vboolean.True()
 			}
 			s.Push(val)
-			return VNil()
+			return vnil.New()
 		},
 
-		"compare": func(s *Stack, t *Table) VType {
+		"compare": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop()
 			b := s.Pop()
-			val := NewVIntegerInt(a.Compare(b))
+			val := vinteger.NewFromInt(a.Compare(b))
 			s.Push(val)
-			return VNil()
+			return vnil.New()
 		},
-		"eq?": func(s *Stack, t *Table) VType {
+		"eq?": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop()
 			b := s.Pop()
-			val := NewVBoolean(a.Compare(b) == 0)
+			val := vboolean.New(a.Compare(b) == 0)
 			s.Push(val)
-			return VNil()
+			return vnil.New()
 		},
 
 		// Control flow
 
-		"if-else": func(s *Stack, t *Table) VType {
+		"if-else": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop().Value().(*p.Tokens)
 			b := s.Pop().Value().(*p.Tokens)
 			cond := s.Pop().Value().(bool)
@@ -229,32 +239,32 @@ func BootedTable() *Table {
 			} else {
 				s, t, _ = Run(b, s, t)
 			}
-			return VNil()
+			return vnil.New()
 		},
-		"call": func(s *Stack, t *Table) VType {
+		"call": func(s *stack.Stack, t *Table) types.VType {
 			val := s.Top().Value()
 			switch val.(type) {
 			case *p.Tokens:
 				s.Pop()
 				Run(val.(*p.Tokens), s, t)
-			case *VBlock:
+			case *vblock.VBlock:
 				toks := new(p.Tokens)
 				*toks = append(*toks, p.Token{"fun", "call"})
 				Run(toks, s, t)
 			default:
 				println("Unexpected type")
 			}
-			return VNil()
+			return vnil.New()
 		},
-		"without": func(s *Stack, t *Table) VType {
+		"without": func(s *stack.Stack, t *Table) types.VType {
 			save := s.Pop()
 			tokens := new(p.Tokens)
 			*tokens = append(*tokens, p.Token{"fun", "call"})
 			Run(tokens, s, t)
 			s.Push(save)
-			return VNil()
+			return vnil.New()
 		},
-		"without2": func(s *Stack, t *Table) VType {
+		"without2": func(s *stack.Stack, t *Table) types.VType {
 			save1 := s.Pop()
 			save2 := s.Pop()
 			tokens := new(p.Tokens)
@@ -262,47 +272,47 @@ func BootedTable() *Table {
 			Run(tokens, s, t)
 			s.Push(save2)
 			s.Push(save1)
-			return VNil()
+			return vnil.New()
 		},
 
 		// Strings
 
-		"concat": func(s *Stack, t *Table) VType {
+		"concat": func(s *stack.Stack, t *Table) types.VType {
 			a := s.Pop().Value().(string)
 			b := s.Pop().Value().(string)
-			c := NewVString(b + a)
+			c := vstring.New(b + a)
 			s.Push(c)
-			return VNil()
+			return vnil.New()
 		},
 
 		// Lists
 
-		"head": func(s *Stack, t *Table) VType {
-			h := s.Pop().Value().([]VType)[0]
+		"head": func(s *stack.Stack, t *Table) types.VType {
+			h := s.Pop().Value().([]types.VType)[0]
 			s.Push(h)
-			return VNil()
+			return vnil.New()
 		},
-		"tail": func(s *Stack, t *Table) VType {
-			v := s.Pop().Value().([]VType)[1:]
-			s.Push(NewVListList(v))
-			return VNil()
+		"tail": func(s *stack.Stack, t *Table) types.VType {
+			v := s.Pop().Value().([]types.VType)[1:]
+			s.Push(vlist.NewFromList(v))
+			return vnil.New()
 		},
-		"cons": func(s *Stack, t *Table) VType {
-			v := s.Pop().(VType)
-			l := s.Pop().Value().([]VType)
+		"cons": func(s *stack.Stack, t *Table) types.VType {
+			v := s.Pop().(types.VType)
+			l := s.Pop().Value().([]types.VType)
 			l = append(l, v)
-			s.Push(NewVListList(l))
-			return VNil()
+			s.Push(vlist.NewFromList(l))
+			return vnil.New()
 		},
-		"append": func(s *Stack, t *Table) VType {
-			a := s.Pop().Value().([]VType)
-			b := s.Pop().Value().([]VType)
+		"append": func(s *stack.Stack, t *Table) types.VType {
+			a := s.Pop().Value().([]types.VType)
+			b := s.Pop().Value().([]types.VType)
 
 			// Ripped from http://golang.org/doc/effective_go.html#slices
 			l := len(a)
 			if l + len(b) > cap(a) {
 				// Allocate double what's needed, for future growth.
-				newSlice := make([]VType, (l + len(b)) * 2)
+				newSlice := make([]types.VType, (l + len(b)) * 2)
 				copy(newSlice, a)
 				a = newSlice
 			}
@@ -311,78 +321,78 @@ func BootedTable() *Table {
 				a[l+i] = c
 			}
 
-			s.Push(NewVListList(a))
-			return VNil()
+			s.Push(vlist.NewFromList(a))
+			return vnil.New()
 		},
-		"apply": func(s *Stack, t *Table) VType {
+		"apply": func(s *stack.Stack, t *Table) types.VType {
 			f := s.Pop().Value().(*p.Tokens)
-			l := s.Pop().Value().([]VType)
+			l := s.Pop().Value().([]types.VType)
 
-			stk := make(Stack, len(l))
+			stk := make(stack.Stack, len(l))
 			for i, o := range l {
-				stk[i] = o.(VType)
+				stk[i] = o.(types.VType)
 			}
 
 			newstk, _, v := Run(f, &stk, t)
 
-			list := make([]VType, len(*newstk))
+			list := make([]types.VType, len(*newstk))
 			for i, o := range *newstk {
-				list[i] = o.(VType)
+				list[i] = o.(types.VType)
 			}
-			s.Push(NewVListList(list))
+			s.Push(vlist.NewFromList(list))
 
 			return v
 		},
-		"reverse": func(s *Stack, t *Table) VType {
-			l := s.Pop().Value().([]VType)
+		"reverse": func(s *stack.Stack, t *Table) types.VType {
+			l := s.Pop().Value().([]types.VType)
 
 			for i, j := 0, len(l)-1; i < j; i, j = i+1, j-1 {
 				l[i], l[j] = l[j], l[i]
 			}
 
-			s.Push(NewVListList(l))
+			s.Push(vlist.NewFromList(l))
 
-			return VNil()
+			return vnil.New()
 		},
 	}
 
 	tbl.functions = t
 
 	contents, _ := ioutil.ReadFile("boot.vk")
-	_, tbl, _ = Eval(string(contents), NewStack(), tbl)
+	_, tbl, _ = Eval(string(contents), stack.New(), tbl)
 
 	return tbl
 }
 
 func BareEval(code string) {
 	tokens := p.Parse(code)
-	Run(tokens, NewStack(), BootedTable())
+	Run(tokens, stack.New(), BootedTable())
 }
 
-func Eval(code string, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
+func Eval(code string, stk *stack.Stack, tbl *Table) (s *stack.Stack, t *Table, v types.VType) {
 	tokens := p.Parse(code)
 	return Run(tokens, stk, tbl)
 }
 
-func Run(tokens *p.Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType) {
-	var val VType = VNil()
+func Run(tokens *p.Tokens, stk *stack.Stack, tbl *Table) (s *stack.Stack, t *Table, v types.VType) {
+	var val types.VType = vnil.New()
 
 	for _, tok := range *tokens {
 		switch tok.Key {
 		case "str":
-			stk.Push(NewVString(tok.Val))
+			stk.Push(vstring.New(tok.Val))
 
 		case "int":
-			stk.Push(NewVInteger(tok.Val))
+			stk.Push(vinteger.New(tok.Val))
 
 		case "list":
 			// TODO: need to make sure you can't add to ^tbl^ from a list.
-			sub := NewStack()
+			sub := stack.New()
 			sub, _, _ = Eval(tok.Val, sub, tbl)
-			stk.Push(NewVList(sub))
+			stk.Push(vlist.New(sub))
 
 		case "stm":
-			stk.Push(NewVBlock(tok.Val))
+			stk.Push(vblock.New(tok.Val))
 
 		case "fun":
 			if tbl.Has(tok.Val) {
@@ -398,7 +408,7 @@ func Run(tokens *p.Tokens, stk *Stack, tbl *Table) (s *Stack, t *Table, v VType)
 
 	// If no value has been set show stack
 	if val.Value() == nil {
-		val = VNil()
+		val = vnil.New()
 	}
 
 	return stk, tbl, val

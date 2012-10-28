@@ -2,9 +2,13 @@ package main
 
 import (
 	p "./parser"
+	"./types"
+	s "./stack"
+
+	"./types/vnil"
 )
 
-type Function func(*Stack, *Table) VType
+type Function func(*s.Stack, *Table) types.VType
 type Table struct {
 	native    map[string]p.Tokens
 	functions map[string]Function
@@ -39,8 +43,8 @@ func (t *Table) Defined() string {
 	return s
 }
 
-func (t *Table) Call(name string, s *Stack) VType {
-	var e VType = VNil()
+func (t *Table) Call(name string, s *s.Stack) types.VType {
+	var e types.VType = vnil.New()
 	if n, np := t.native[name]; np {
 		_, _, e = Run(&n, s, t)
 	} else if f, fp := t.functions[name]; fp {
