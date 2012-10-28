@@ -57,6 +57,14 @@ func main() {
 		if os.Args[1] == "doc" {
 			Doc([]string{os.Args[2]}, "doc.html")
 
+		} else if os.Args[1] == "help" || os.Args[1] == "-h" || os.Args[1] == "--help" || os.Args[1] == "-?" {
+			fmt.Println(
+				"Usage: vodka [files...]\n",
+				"\n",
+				"  Given no files to run, vodka will launch into a REPL.\n",
+				"  Given a list of files, vodka will run each file in turn.\n",
+				)
+
 		} else {
 			for _, file := range os.Args[1:] {
 				contents, _ := ioutil.ReadFile(file)
