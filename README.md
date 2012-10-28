@@ -83,6 +83,8 @@ off,
 [] => nil
 >> 4 cb
 [64] => 64
+>> pop
+[] => 64
 >> 'fib' [
 ..   dup dup 1 eq? swap 0 eq? or not [
 ..     dup 1 sub fib
@@ -97,11 +99,11 @@ off,
 >> 3 fib
 [1 1 2] => nil
 >> 10 fib
-[1 1 55] => nil
+[1 1 2 55] => nil
 >> (1 1) [ dup2 + ] apply
-[(1 1 2)] => nil
+[1 1 2 55 (1 1 2)] => nil
 >> [[ dup2 + ] apply ] 5 times
-[(1 1 2 3 5 8 13 21)] => nil
+[1 1 2 55 (1 1 2 3 5 8 13 21)] => nil
 >> 'n-fib' [
 ..   ; check if the number at the top of the stack is less than 2
 ..   dup 2 lt?
@@ -115,9 +117,9 @@ off,
 ..     times
 ..     ] if-else
 ..   ] define
->> 5 n-fib
+>> drop 5 n-fib
 [(1 1 2 3 5)] => nil
->> 20 n-fib
+>> drop 20 n-fib
 [(1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765)] => nil
 >> quit
 $
