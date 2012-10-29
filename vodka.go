@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"./interpreter"
 	"./stack"
 	"./types"
 	"./types/vnil"
@@ -53,6 +54,9 @@ func completePair(line, o string) string {
 }
 
 func main() {
+	stk := stack.New()
+	tbl := interpreter.BootedTable()
+
 	if len(os.Args) > 1 {
 		if os.Args[1] == "doc" {
 			Doc([]string{os.Args[2]}, "doc.html")
@@ -68,14 +72,12 @@ func main() {
 		} else {
 			for _, file := range os.Args[1:] {
 				contents, _ := ioutil.ReadFile(file)
-				BareEval(string(contents))
+				interpreter.Eval(string(contents), stk, tbl)
 			}
 		}
 
 	} else {
 		fmt.Println("Vodka REPL, CTRL+C or type 'quit' to quit")
-		stk := stack.New()
-		tbl := BootedTable()
 
 		for {
 			line := promptLine(">> ")
@@ -89,7 +91,7 @@ func main() {
 			line = completePair(line, "\"")
 
 			var e types.VType = vnil.New()
-			stk, tbl, e = Eval(line, stk, tbl)
+			stk, tbl, e = interpreter.Eval(line, stk, tbl)
 			fmt.Printf("%s => %s\n", stk.TruncatedString(), e.String())
 		}
 	}

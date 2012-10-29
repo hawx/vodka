@@ -1,20 +1,20 @@
-package main
+package interpreter
 
 import (
 	"fmt"
 	"io/ioutil"
-	p "./parser"
+	p "../parser"
 
-	"./table"
-	"./stack"
+	"../table"
+	"../stack"
 
-	"./types"
-	"./types/vblock"
-	"./types/vboolean"
-	"./types/vnil"
-	"./types/vstring"
-	"./types/vinteger"
-	"./types/vlist"
+	"../types"
+	"../types/vblock"
+	"../types/vboolean"
+	"../types/vnil"
+	"../types/vstring"
+	"../types/vinteger"
+	"../types/vlist"
 )
 
 func BootedTable() *table.Table {
@@ -365,11 +365,6 @@ func BootedTable() *table.Table {
 	return tbl
 }
 
-func BareEval(code string) {
-	tokens := p.Parse(code)
-	Run(tokens, stack.New(), BootedTable())
-}
-
 func Eval(code string, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
 	tokens := p.Parse(code)
 	return Run(tokens, stk, tbl)
@@ -423,11 +418,6 @@ func Run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *t
 		default:
 			println("Unknown token: " + tok.String())
 		}
-	}
-
-	// If no value has been set show stack
-	if val.Value() == nil {
-		val = vnil.New()
 	}
 
 	return stk, tbl, val
