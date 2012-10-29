@@ -2,10 +2,10 @@
 package table
 
 import (
-	p "../parser"
-	s "../stack"
+	p "github.com/hawx/vodka/parser"
+	s "github.com/hawx/vodka/stack"
 
-	"../types"
+	"github.com/hawx/vodka/types"
 )
 
 // A function takes the current stack, the table and returns a value.

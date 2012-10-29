@@ -3,18 +3,18 @@ package interpreter
 import (
 	"fmt"
 	"io/ioutil"
-	p "../parser"
+	p "github.com/hawx/vodka/parser"
 
-	"../table"
-	"../stack"
+	"github.com/hawx/vodka/table"
+	"github.com/hawx/vodka/stack"
 
-	"../types"
-	"../types/vblock"
-	"../types/vboolean"
-	"../types/vnil"
-	"../types/vstring"
-	"../types/vinteger"
-	"../types/vlist"
+	"github.com/hawx/vodka/types"
+	"github.com/hawx/vodka/types/vblock"
+	"github.com/hawx/vodka/types/vboolean"
+	"github.com/hawx/vodka/types/vnil"
+	"github.com/hawx/vodka/types/vstring"
+	"github.com/hawx/vodka/types/vinteger"
+	"github.com/hawx/vodka/types/vlist"
 )
 
 func BootedTable() *table.Table {

@@ -2,7 +2,7 @@
 package vinteger
 
 import (
-	"../../types"
+	"github.com/hawx/vodka/types"
 	"strconv"
 )
 

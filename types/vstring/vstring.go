@@ -1,7 +1,7 @@
 // Package vstring implements the string type.
 package vstring
 
-import "../../types"
+import "github.com/hawx/vodka/types"
 
 // A string value, eg. `"hello world"`.
 type VString struct {

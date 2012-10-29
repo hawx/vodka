@@ -2,8 +2,8 @@
 package vblock
 
 import (
-	"../../types"
-	"../../parser"
+	"github.com/hawx/vodka/types"
+	"github.com/hawx/vodka/parser"
 	"strings"
 )
 

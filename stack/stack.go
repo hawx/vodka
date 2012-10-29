@@ -3,8 +3,8 @@ package stack
 
 import (
 	"fmt"
-	"../types"
-	"../types/vstring"
+	"github.com/hawx/vodka/types"
+	"github.com/hawx/vodka/types/vstring"
 )
 
 

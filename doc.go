@@ -4,9 +4,10 @@ import (
 	"strings"
 	"regexp"
 	"io/ioutil"
-	"./parser"
 	"github.com/hoisie/mustache"
 	"sort"
+
+	"github.com/hawx/vodka/parser"
 )
 
 type FunctionDoc struct {

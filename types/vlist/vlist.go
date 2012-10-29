@@ -2,8 +2,8 @@
 package vlist
 
 import (
-	"../../types"
-	"../../stack"
+	"github.com/hawx/vodka/types"
+	"github.com/hawx/vodka/stack"
 )
 
 // A list type, eg. `(1 2 3)`.

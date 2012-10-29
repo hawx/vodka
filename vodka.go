@@ -7,10 +7,10 @@ import (
 	"io/ioutil"
 	"os"
 
-	"./interpreter"
-	"./stack"
-	"./types"
-	"./types/vnil"
+	"github.com/hawx/vodka/interpreter"
+	"github.com/hawx/vodka/stack"
+	"github.com/hawx/vodka/types"
+	"github.com/hawx/vodka/types/vnil"
 )
 
 func toString(bytes []uint8) string {
