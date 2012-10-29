@@ -11,6 +11,7 @@ import (
 	"github.com/hawx/vodka/stack"
 	"github.com/hawx/vodka/types"
 	"github.com/hawx/vodka/types/vnil"
+	"github.com/hawx/vodka/doc"
 )
 
 func toString(bytes []uint8) string {
@@ -59,7 +60,7 @@ func main() {
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "doc" {
-			Doc([]string{os.Args[2]}, "doc.html")
+			doc.Doc([]string{os.Args[2]}, "doc.html")
 
 		} else if os.Args[1] == "help" || os.Args[1] == "-h" || os.Args[1] == "--help" || os.Args[1] == "-?" {
 			fmt.Println(

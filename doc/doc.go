@@ -1,4 +1,4 @@
-package main
+package doc
 
 import (
 	"strings"
@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"github.com/hoisie/mustache"
 	"sort"
+	"os"
+	"fmt"
 
 	"github.com/hawx/vodka/parser"
 )
@@ -115,8 +117,28 @@ func (g *GroupDatas) Add(val GroupData) {
 	*g = append(*g, val)
 }
 
+var thisDir string = os.Getenv("GOPATH") + "/src/github.com/hawx/vodka"
+
+func ReadRsc(file string) string {
+	f, err := os.Open(thisDir + "/doc/rsc/" + file)
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Could not read '" + file + "'.")
+		os.Exit(1)
+	}
+
+	c, _ := ioutil.ReadAll(f)
+
+	return string(c)
+}
+
 func Doc(input []string, output string) {
-	tmpl, _ := mustache.ParseFile("doc.mustache")
+	tmpl, err := mustache.ParseFile(thisDir + "/doc/doc.mustache")
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Could not read 'doc.mustache' file")
+		os.Exit(1)
+	}
 
 	for _, file := range input {
 	  contents, _ := ioutil.ReadFile(file)
@@ -148,6 +170,12 @@ func Doc(input []string, output string) {
 		data := map[string]interface{}{
 			"Title": "Docs",
 			"Groups": finalDatas,
+			"Styles": ReadRsc("style.css"),
+			"Scripts": ReadRsc("jquery.min.js") +
+				ReadRsc("jquery.appear.min.js") +
+				ReadRsc("rainbow.min.js") +
+				ReadRsc("rainbow.vodka.js") +
+				ReadRsc("doc.js"),
 		}
 
 		str := tmpl.Render(data)
