@@ -1,29 +1,36 @@
+// Package vnil implements the nil type.
 package vnil
 
 import "../../types"
 
-type VNilType struct{}
+// the nil value, `nil`.
+type VNil struct{}
 
-func (v *VNilType) String() string {
+// String returns the string value of the VNil, "nil".
+func (v *VNil) String() string {
 	return "nil"
 }
 
-func (v *VNilType) Value() interface{} {
+// Value returns the value of the VNil, `nil`.
+func (v *VNil) Value() interface{} {
 	return nil
 }
 
-func (v *VNilType) Type() string {
+// Type returns the name of the type, "nil".
+func (v *VNil) Type() string {
 	return "nil"
 }
 
-func (v *VNilType) Compare(other types.VType) int {
-	if _, same := (other).(*VNilType); same {
+// Compare returns 0 if the other value is a VNil, and -2 otherwise.
+func (v *VNil) Compare(other types.VType) int {
+	if _, same := (other).(*VNil); same {
 		return 0
 	}
 	return -2
 }
 
-func New() *VNilType {
-	r := new(VNilType)
+// New creates a new VNil
+func New() *VNil {
+	r := new(VNil)
 	return r
 }
