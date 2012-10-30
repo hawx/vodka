@@ -17,6 +17,7 @@ import (
 	"github.com/hawx/vodka/types/vlist"
 )
 
+// BootedTable returns a table with built in functions defined.
 func BootedTable() *table.Table {
 	tbl := table.New()
 
@@ -365,12 +366,15 @@ func BootedTable() *table.Table {
 	return tbl
 }
 
+// Eval runs the string of vodka code given using the Stack and Table passed. It
+// returns the modified Stack and Table, along with the last returned value.
 func Eval(code string, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
 	tokens := p.Parse(code)
 	return Run(tokens, stk, tbl)
 }
 
-// Temp.
+// TableCall finds the named function in the Table and runs it using the Stack
+// given. It returns the value returned by the function.
 func TableCall(name string, t *table.Table, s *stack.Stack) types.VType {
 	var e types.VType = vnil.New()
 
@@ -388,27 +392,29 @@ func TableCall(name string, t *table.Table, s *stack.Stack) types.VType {
 	return e
 }
 
+// Run takes a series of tokens and runs them using the Stack and Table
+// given. It returns the modified Stack and Table along with the last returned
+// value.
 func Run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
 	var val types.VType = vnil.New()
 
 	for _, tok := range *tokens {
 		switch tok.Key {
-		case "str":
+		case "str": // strings are pushed onto the stack as vstrings
 			stk.Push(vstring.New(tok.Val))
 
-		case "int":
+		case "int": // ints are pushed onto the stack as vintegers
 			stk.Push(vinteger.New(tok.Val))
 
-		case "list":
-			// TODO: need to make sure you can't add to ^tbl^ from a list.
+		case "list": // lists are pushed onto the stack as vlists
 			sub := stack.New()
 			sub, _, _ = Eval(tok.Val, sub, tbl)
 			stk.Push(vlist.New(sub))
 
-		case "stm":
+		case "stm": // statements are pushed onto the stack as vblocks
 			stk.Push(vblock.New(tok.Val))
 
-		case "fun":
+		case "fun": // functions are called immediately
 			if tbl.Has(tok.Val) {
 				val = TableCall(tok.Val, tbl, stk)
 			} else {

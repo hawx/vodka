@@ -1,3 +1,4 @@
+// Package parser implements a simple parser for the vodka language.
 package parser
 
 // Synopsis:
@@ -13,6 +14,7 @@ import (
 
 type Tokens []Token
 
+// String returns a formatted string showing the tokens.
 func (ts *Tokens) String() string {
 	str := "["
 	for i, t := range *ts {
@@ -24,10 +26,12 @@ func (ts *Tokens) String() string {
 	return str + "]"
 }
 
+// Add appends a Token to the list of tokens.
 func (ts *Tokens) Add(tok Token) {
 	*ts = append(*ts, tok)
 }
 
+// AddToken appends a new Token with the key and value given.
 func (ts *Tokens) AddToken(key, val string) {
 	ts.Add(Token{key, val})
 }
@@ -42,6 +46,9 @@ func (t *Token) String() string {
 	return "[" + t.Key + ": " + t.Val + "]"
 }
 
+
+// FullParse implements the parser for vodka source code. It takes a string of
+// source code and returns the corresponding Tokens.
 func FullParse(code string) *Tokens {
 	list := new(Tokens)
 
@@ -112,6 +119,8 @@ func FullParse(code string) *Tokens {
 	return list
 }
 
+// Parse implements a subset of FullParse, it will strip all comments and
+// newlines from the returned Tokens.
 func Parse(code string) *Tokens {
 	list := new(Tokens)
 
@@ -123,6 +132,7 @@ func Parse(code string) *Tokens {
 
 	return list
 }
+
 
 func parseUntil(idx int, code string, until uint8) (i int, s string) {
 	return parseUntilAny(idx, code, []uint8{until})
