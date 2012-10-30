@@ -90,6 +90,7 @@ func main() {
 			line = completeLine(line, "[", "]")
 			line = completePair(line, "'")
 			line = completePair(line, "\"")
+			line = completeLine(line, "(", ")")
 
 			var e types.VType = vnil.New()
 			stk, tbl, e = interpreter.Eval(line, stk, tbl)
