@@ -1,3 +1,7 @@
+package main
+
+const BOOT string = `
+
 '__document__' . define
 
 ; Evaluates the string at the top of the stack as vodka source code.
@@ -275,9 +279,9 @@
 'lt?'  [ compare -1 eq? ] define
 
 ; Checks whether the top element is not equal to the second. Note: this has a
-; different meaning to `eq? not`. This will return false if the elements are
+; different meaning to 'eq? not'. This will return false if the elements are
 ; lt? or gt? or eq?. Make sure you understand this properly before using, in
-; most cases you will want to use `eq? not` instead.
+; most cases you will want to use 'eq? not' instead.
 ;
 ; sig: 'a 'b -> bool
 ; example: 'a' 4 neq? ;=> [true]
@@ -457,3 +461,5 @@
 'reduce' [
   wrap :stack compose apply head
 ] define
+
+`

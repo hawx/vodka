@@ -54,15 +54,24 @@ func completePair(line, o string) string {
 	return line
 }
 
+var HELP_FLAGS []string = []string{"help", "-h", "--help", "-?"}
+
+func isHelpFlag(s string) bool {
+	for _, flag := range HELP_FLAGS {
+		if flag == s { return true }
+	}
+	return false
+}
+
 func main() {
 	stk := stack.New()
-	tbl := interpreter.BootedTable()
+	tbl := interpreter.BootedTable(BOOT)
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "doc" {
 			doc.Doc([]string{os.Args[2]}, "doc.html")
 
-		} else if os.Args[1] == "help" || os.Args[1] == "-h" || os.Args[1] == "--help" || os.Args[1] == "-?" {
+		} else if isHelpFlag(os.Args[1]) {
 			fmt.Println(
 				"Usage: vodka [files...]\n",
 				"\n",

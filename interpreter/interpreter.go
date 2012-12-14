@@ -19,7 +19,7 @@ import (
 )
 
 // BootedTable returns a table with built in functions defined.
-func BootedTable() *table.Table {
+func BootedTable(boot string) *table.Table {
 	tbl := table.New()
 
 	tbl.Define("eval", func(s *stack.Stack, t *table.Table) types.VType {
@@ -385,8 +385,7 @@ func BootedTable() *table.Table {
 		return vnil.New()
 	}, "list -> list")
 
-	contents, _ := ioutil.ReadFile("boot.vk")
-	_, tbl, _ = Eval(string(contents), stack.New(), tbl)
+	_, tbl, _ = Eval(boot, stack.New(), tbl)
 
 	return tbl
 }
