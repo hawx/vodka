@@ -384,6 +384,54 @@ func BootedTable(boot string) *table.Table {
 		return vnil.New()
 	})
 
+	// spec
+
+	var specTbl map[string]bool
+
+	tbl.Define("describe", func(s *stack.Stack, t *table.Table) types.VType {
+		block := s.Pop().Value().(*p.Tokens)
+		desc  := s.Pop().Value().(string)
+
+		fmt.Print("\n" + desc + "\n  ")
+
+		specTbl = map[string]bool{}
+		Run(block, s, t)
+
+		fmt.Print("\n")
+
+		passCount := 0
+		failCount := 0
+		for v,k := range specTbl {
+			if k {
+				passCount++
+			} else {
+				failCount++
+				fmt.Println("  FAIL " + v)
+			}
+		}
+
+		fmt.Printf("\n  %v pass / %v fail\n", passCount, failCount)
+
+		return vnil.New()
+	})
+
+	tbl.Define("can", func(s *stack.Stack, t *table.Table) types.VType {
+		block := s.Pop().Value().(*p.Tokens)
+		desc  := s.Pop().Value().(string)
+
+		ns, _, _ := Run(block, s, t)
+		if ns.Pop().Value().(bool) {
+			fmt.Print(".")
+			specTbl[desc] = true
+		} else {
+			fmt.Print("x")
+			specTbl[desc] = false
+		}
+
+		return vnil.New()
+	})
+
+
 	_, tbl, _ = Eval(boot, stack.New(), tbl)
 
 	return tbl
