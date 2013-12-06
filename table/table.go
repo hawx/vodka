@@ -2,75 +2,16 @@
 package table
 
 import (
-	"fmt"
-	"strings"
-
 	p "github.com/hawx/vodka/parser"
 	s "github.com/hawx/vodka/stack"
 	"github.com/hawx/vodka/types"
 )
-
-// A type signature for a vodka function.
-type Signature struct {
-	// The expected elements on the stack.
-	In   []string
-	// The output of the function to the stack.
-	Out  []string
-}
-
-func ParseSignature(sig string) Signature {
-	parts := strings.Split(sig, "->")
-	if len(parts) != 2 {
-		fmt.Println("Malformed signature: '", sig, "'.")
-	}
-
-	lhs := parts[0]; rhs := parts[1]
-
-	left  := strings.Split(strings.TrimSpace(lhs), " ")
-	right := strings.Split(strings.TrimSpace(rhs), " ")
-
-	for i,_ := range left {
-		left[i] = strings.TrimSpace(left[i])
-	}
-
-	if len(left) == 1 && left[0] == "" { left = []string{} }
-
-	for i,_ := range right {
-		right[i] = strings.TrimSpace(right[i])
-	}
-
-	if len(right) == 1 && right[0] == "" { right = []string{} }
-
-	return Signature{left, right}
-}
-
-func (s Signature) String() string {
-	return strings.Join(s.In, " ") + " -> " + strings.Join(s.Out, " ")
-}
-
-func (s Signature) Check(stk *s.Stack) bool {
-	if len(s.In) > 0 && s.In[0] == "'A" { s.In = s.In[1:len(s.In)] }
-	top := stk.Peek(len(s.In))
-
-	if len(s.In) != len(top) { return false }
-
-	for i,e := range top {
-		if s.In[i][0:1] == "'" {
-			// wildcard, ignore.
-		} else if s.In[i] != e.Type() {
-			return false
-		}
-	}
-
-	return true
-}
 
 type function func(*s.Stack, *Table) types.VType
 
 // A function takes the current stack, the table and returns a value.
 type Function struct {
 	Apply  function
-	Sig    Signature
 }
 
 // A table consists of natively defined functions, ie. those defined in vodka
@@ -122,8 +63,8 @@ func (t *Table) Has(name string) bool {
 }
 
 // Define adds a new (go) function to the table with the name given.
-	func (t *Table) Define(name string, f function, sig string) {
-	t.Function[name] = Function{f, ParseSignature(sig)}
+func (t *Table) Define(name string, f function) {
+	t.Function[name] = Function{f}
 }
 
 // DefineNative adds a new (vodka) function to the table with the name given.
