@@ -17,13 +17,16 @@ import (
 	"github.com/hawx/vodka/types/vlist"
 )
 
+// Special assign that will be executed before the interpreter exits.
+var onExitStms *p.Tokens
+
 // BootedTable returns a table with built in functions defined.
 func BootedTable(boot string) *table.Table {
 	tbl := table.New()
 
 	tbl.Define("eval", func(s *stack.Stack, t *table.Table) types.VType {
 		str := s.Pop().Value().(string)
-		_, _, v := Eval(str, s, t)
+		_, _, v := eval(str, s, t)
 		return v
 	})
 
@@ -38,6 +41,11 @@ func BootedTable(boot string) *table.Table {
 		stms := s.Pop().Value().(*p.Tokens)
 		name := s.Pop().Value().(string)
 		t.DefineNative(name, stms)
+		return vnil.New()
+	})
+
+	tbl.Define("on-exit", func(s *stack.Stack, t *table.Table) types.VType {
+		onExitStms = s.Pop().Value().(*p.Tokens)
 		return vnil.New()
 	})
 
@@ -256,9 +264,9 @@ func BootedTable(boot string) *table.Table {
 		b := s.Pop().Value().(*p.Tokens)
 		cond := s.Pop().Value().(bool)
 		if cond {
-			s, t, _ = Run(a, s, t)
+			s, t, _ = run(a, s, t)
 		} else {
-			s, t, _ = Run(b, s, t)
+			s, t, _ = run(b, s, t)
 		}
 		return vnil.New()
 	})
@@ -268,11 +276,11 @@ func BootedTable(boot string) *table.Table {
 		switch val.(type) {
 		case *p.Tokens:
 			s.Pop()
-			Run(val.(*p.Tokens), s, t)
+			run(val.(*p.Tokens), s, t)
 		case *vblock.VBlock:
 			toks := new(p.Tokens)
 			*toks = append(*toks, p.Token{"fun", "call"})
-			Run(toks, s, t)
+			run(toks, s, t)
 		default:
 			println("Unexpected type")
 		}
@@ -283,7 +291,7 @@ func BootedTable(boot string) *table.Table {
 		save := s.Pop()
 		tokens := new(p.Tokens)
 		*tokens = append(*tokens, p.Token{"fun", "call"})
-		Run(tokens, s, t)
+		run(tokens, s, t)
 		s.Push(save)
 		return vnil.New()
 	})
@@ -293,7 +301,7 @@ func BootedTable(boot string) *table.Table {
 		save2 := s.Pop()
 		tokens := new(p.Tokens)
 		*tokens = append(*tokens, p.Token{"fun", "call"})
-		Run(tokens, s, t)
+		run(tokens, s, t)
 		s.Push(save2)
 		s.Push(save1)
 		return vnil.New()
@@ -361,7 +369,7 @@ func BootedTable(boot string) *table.Table {
 			stk[i] = o.(types.VType)
 		}
 
-		newstk, _, v := Run(f, &stk, t)
+		newstk, _, v := run(f, &stk, t)
 
 		list := make([]types.VType, len(*newstk))
 		for i, o := range *newstk {
@@ -387,6 +395,8 @@ func BootedTable(boot string) *table.Table {
 	// spec
 
 	var specTbl map[string]bool
+	passCount := 0
+	failCount := 0
 
 	tbl.Define("describe", func(s *stack.Stack, t *table.Table) types.VType {
 		block := s.Pop().Value().(*p.Tokens)
@@ -395,12 +405,10 @@ func BootedTable(boot string) *table.Table {
 		fmt.Print("\n" + desc + "\n  ")
 
 		specTbl = map[string]bool{}
-		Run(block, s, t)
+		run(block, s, t)
 
 		fmt.Print("\n")
 
-		passCount := 0
-		failCount := 0
 		for v,k := range specTbl {
 			if k {
 				passCount++
@@ -410,7 +418,7 @@ func BootedTable(boot string) *table.Table {
 			}
 		}
 
-		fmt.Printf("\n  %v pass / %v fail\n", passCount, failCount)
+		onExitStms = p.Parse("'" + fmt.Sprintf("\n  %v pass / %v fail", passCount, failCount) + "' print")
 
 		return vnil.New()
 	})
@@ -419,7 +427,7 @@ func BootedTable(boot string) *table.Table {
 		block := s.Pop().Value().(*p.Tokens)
 		desc  := s.Pop().Value().(string)
 
-		ns, _, _ := Run(block, s, t)
+		ns, _, _ := run(block, s, t)
 		if ns.Pop().Value().(bool) {
 			fmt.Print(".")
 			specTbl[desc] = true
@@ -431,42 +439,37 @@ func BootedTable(boot string) *table.Table {
 		return vnil.New()
 	})
 
-
-	_, tbl, _ = Eval(boot, stack.New(), tbl)
+	_, tbl, _ = eval(boot, stack.New(), tbl)
 
 	return tbl
 }
 
-// Eval runs the string of vodka code given using the Stack and Table passed. It
-// returns the modified Stack and Table, along with the last returned value.
-func Eval(code string, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
+
+func eval(code string, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
 	tokens := p.Parse(code)
-	return Run(tokens, stk, tbl)
+	return run(tokens, stk, tbl)
 }
 
-// TableCall finds the named function in the Table and runs it using the Stack
+// tableCall finds the named function in the Table and runs it using the Stack
 // given. It returns the value returned by the function.
-func TableCall(name string, t *table.Table, s *stack.Stack) types.VType {
+func tableCall(name string, t *table.Table, s *stack.Stack) types.VType {
 	var e types.VType = vnil.New()
 
 	if n, ok := t.Native[name]; ok {
-		_, _, e = Run(&n, s, t)
+		_, _, e = run(&n, s, t)
 
 	} else if f, ok := t.Function[name]; ok {
 		e = f.Apply(s, t)
 
 	} else {
 		a, _ := t.Aliases[name]
-		return TableCall(a, t, s)
+		return tableCall(a, t, s)
 	}
 
 	return e
 }
 
-// Run takes a series of tokens and runs them using the Stack and Table
-// given. It returns the modified Stack and Table along with the last returned
-// value.
-func Run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
+func run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
 	var val types.VType = vnil.New()
 
 	for _, tok := range *tokens {
@@ -479,7 +482,7 @@ func Run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *t
 
 		case "list": // lists are pushed onto the stack as vlists
 			sub := stack.New()
-			sub, _, _ = Eval(tok.Val, sub, tbl)
+			sub, _, _ = eval(tok.Val, sub, tbl)
 			stk.Push(vlist.New(sub))
 
 		case "stm": // statements are pushed onto the stack as vblocks
@@ -487,7 +490,7 @@ func Run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *t
 
 		case "fun": // functions are called immediately
 			if tbl.Has(tok.Val) {
-				val = TableCall(tok.Val, tbl, stk)
+				val = tableCall(tok.Val, tbl, stk)
 			} else {
 				println("Unknown function: '" + tok.Val + "'")
 			}
@@ -498,4 +501,29 @@ func Run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *t
 	}
 
 	return stk, tbl, val
+}
+
+// Eval runs the string of vodka code given using the Stack and Table passed. It
+// returns the modified Stack and Table, along with the last returned value.
+func Eval(code string, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
+	s, t, v := eval(code, stk, tbl)
+
+	if onExitStms != nil {
+		run(onExitStms, s, t)
+	}
+
+	return s, t, v
+}
+
+// Run takes a series of tokens and runs them using the Stack and Table
+// given. It returns the modified Stack and Table along with the last returned
+// value.
+func Run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
+	s, t, v := run(tokens, stk, tbl)
+
+	if onExitStms != nil {
+		run(onExitStms, s, t)
+	}
+
+	return s, t, v
 }
