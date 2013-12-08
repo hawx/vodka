@@ -34,9 +34,22 @@ func (v *VList) Type() string {
 }
 
 // Compare returns 0 if the values are equal, -2 otherwise.
-// BUG: need to actually make this check for equality.
 func (v *VList) Compare(other types.VType) int {
-	return -2
+	val, same := other.(*VList)
+
+	if !same { return -2 }
+
+	if len(v.value) != len(val.value) {
+		return -2
+	}
+
+	for i := 0; i < len(v.value); i++ {
+		if c := v.value[i].Compare(val.value[i]); c != 0 {
+			return -2
+		}
+	}
+
+	return 0
 }
 
 // New creates a new list from the Stack given.
