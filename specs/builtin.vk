@@ -1,0 +1,226 @@
+'eval' [
+  'run the given string as if it were source code' [
+    "1 2 =" eval
+    1 2 =
+    =
+  ] can
+] describe
+
+'alias' [
+  'give another name for a function' [
+    'true' 'yes' alias
+    yes
+  ] can
+] describe
+
+'define' [
+  'name a function' [
+    'my-function' [ 100 ] define
+    my-function
+    100 =
+  ] can
+] describe
+
+'type' [
+  'give the type for a string' [
+    'hello' type 'string' =
+  ] can
+
+  'give the type for an integer' [
+    123 type 'integer' =
+  ] can
+
+  'give the type for a list' [
+    (1 2 3) type 'list' =
+  ] can
+
+  'give the type for a block' [
+    [ 'test' print ] type 'block' =
+  ] can
+
+  'give the type of true' [
+    true type 'boolean' =
+  ] can
+
+  'give the type of false' [
+    false type 'boolean' =
+  ] can
+
+  'give the type of nil' [
+    nil type 'nil' =
+  ] can
+] describe
+
+'empty?' [
+  'check if the stack is empty' [
+    empty?
+  ] can
+
+  'check if the stack is not empty' [
+    1 empty? not
+  ] can
+] describe
+
+'small?' [
+  'check if the stack contains no elements' [
+    small?
+  ] can
+
+  'check if the stack contains one element' [
+    1 small?
+  ] can
+
+  'check if the stack contains some elements' [
+    1 2 small? not
+  ] can
+] describe
+
+'nil?' [
+  'see nil is nil' [
+    nil nil?
+  ] can
+
+  'see true is not nil' [
+    true nil? not
+  ] can
+
+  'see false is not nil' [
+    false nil? not
+  ] can
+
+  'see a number is not nil' [
+    0 nil? not
+  ] can
+
+  'see a string is not nil' [
+    'hello' nil? not
+  ] can
+
+  'see a list is not nil' [
+    (1 2 3) nil? not
+  ] can
+
+  'see a block is not nil' [
+    [ ] nil? not
+  ] can
+] describe
+
+'boolean?' [
+  'see true is boolean' [
+    true boolean?
+  ] can
+
+  'see false is boolean' [
+    false boolean?
+  ] can
+
+  'see nil is not boolean' [
+    nil boolean? not
+  ] can
+
+  'see a number is not boolean' [
+    0 boolean? not
+  ] can
+
+  'see a string is not boolean' [
+    'hello' boolean? not
+  ] can
+
+  'see a list is not boolean' [
+    (1 2 3) boolean? not
+  ] can
+
+  'see a block is not boolean' [
+    [ ] boolean? not
+  ] can
+] describe
+
+'block?' [
+  'see a block is a block' [
+    [ ] block?
+  ] can
+
+  'see true is not a block' [
+    true block? not
+  ] can
+
+  'see false is not a block' [
+    false block? not
+  ] can
+
+  'see nil is not a block' [
+    nil block? not
+  ] can
+
+  'see a number is not a block' [
+    0 block? not
+  ] can
+
+  'see a string is not a block' [
+    'hello' block? not
+  ] can
+
+  'see a list is not a block' [
+    (1 2 3) block? not
+  ] can
+] describe
+
+'string?' [
+  'see a string is a string' [
+    'hello' string?
+  ] can
+
+  'see true is not a string' [
+    true string? not
+  ] can
+
+  'see false is not a string' [
+    false string? not
+  ] can
+
+  'see nil is not a string' [
+    nil string? not
+  ] can
+
+  'see a number is not a string' [
+    0 string? not
+  ] can
+
+  'see a list is not a string' [
+    (1 2 3) string? not
+  ] can
+
+  'see a block is not a string' [
+    [ ] string? not
+  ] can
+] describe
+
+'integer?' [
+  'see a number is an integer' [
+    0 integer?
+  ] can
+
+  'see true is not an integer' [
+    true integer? not
+  ] can
+
+  'see false is not an integer' [
+    false integer? not
+  ] can
+
+  'see nil is not an integer' [
+    nil integer? not
+  ] can
+
+  'see a string is not an integer' [
+    'hello' integer? not
+  ] can
+
+  'see a list is not an integer' [
+    (1 2 3) integer? not
+  ] can
+
+  'see a block is not an integer' [
+    [ ] integer? not
+  ] can
+] describe

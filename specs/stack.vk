@@ -1,0 +1,80 @@
+'pop' [
+  'remove the top element on the stack' [
+    1 2 pop 1 =
+  ] can
+] describe
+
+'size' [
+  'find the size of the stack' [
+    1 2 3 4 5 size 5 =
+  ] can
+] describe
+
+'dup' [
+  'duplicate the top element of the stack' [
+    1 dup
+    1 = swap
+    1 =
+    and
+  ] can
+] describe
+
+'swap' [
+  'swap the top two elements on the stack' [
+    1 2 3
+    3 =
+    swap
+    2 =
+    and
+  ] can
+] describe
+
+'drop' [
+  'clear the stack' [
+    1 2 3 4 5 6
+    drop
+    size 0 =
+  ] can
+] describe
+
+'compose' [
+  'compose the top two blocks on the stack' [
+    [ 1 2 ] :+ compose call
+    3 =
+  ] can
+] describe
+
+'wrap' [
+  'wrap the top element in a block' [
+    3 wrap
+    dup block? swap
+    call
+    3 =
+    and
+  ] can
+] describe
+
+'dup2' [
+  'duplicate the top two elements of the stack' [
+    1 2 dup2
+    2 =     swap
+    1 = and swap
+    2 = and swap
+    1 = and
+  ] can
+] describe
+
+'swapp' [
+  'swap the second and third elements of the stack' [
+    1 2 3 swapp
+    3 =     swap
+    1 = and swap
+    2 = and
+  ] can
+] describe
+
+'stack' [
+  'reduce the stack' [
+    1 2 3 4 :+ stack 10 =
+  ] can
+] describe

@@ -1,0 +1,106 @@
+'or' [
+  'give the disjunction of true and true' [
+    true true or
+  ] can
+
+  'give the disjunction of true and false' [
+    false true or
+  ] can
+
+  'give the disjunction of false and true' [
+    true false or
+  ] can
+
+  'give the disjunction of false and false' [
+    false false or not
+  ] can
+] describe
+
+'and' [
+  'give the conjunction of true and true' [
+    true true and
+  ] can
+
+  'give the conjunction of true and false' [
+    false true and not
+  ] can
+
+  'give the conjunction of false and true' [
+    true false and not
+  ] can
+
+  'give the conjunction of false and false' [
+    false false and not
+  ] can
+] describe
+
+'compare' [
+  'check for less than' [
+    1 0 compare -1 =
+  ] can
+
+  'check for equality' [
+    0 0 compare 0 =
+  ] can
+
+  'check for greater than' [
+    0 1 compare 1 =
+  ] can
+] describe
+
+'eq?' [
+  'check for equality of integers' [
+    1 1 eq?
+  ] can
+
+  'check for disequality of integers' [
+    -1 1 eq? not
+  ] can
+
+  'check for equality of strings' [
+    'hey' 'hey' eq?
+  ] can
+
+  'check for disequality of strings' [
+    'hi' 'hello' eq? not
+  ] can
+
+  'check for equality of lists' [
+    (1 2) (1 2) eq?
+  ] can
+
+  'check for disequality of lists' [
+    (1) (1 2 3) eq? not
+  ] can
+] describe
+
+'not' [
+  'negate true'  [ true  not false = ] can
+  'negate false' [ false not true  = ] can
+] describe
+
+'gt?' [
+  'check top element is greater than second' [
+    1 2 gt?
+  ] can
+
+  'check top element is not greater than second' [
+    1 1 gt? not
+  ] can
+] describe
+
+'lt?' [
+  'check top element is less than second' [
+    1 0 lt?
+  ] can
+
+  'check top element is not less than second' [
+    1 1 lt? not
+  ] can
+] describe
+
+'neq?' [
+  'checks for not eq? or lt? or gt?' [
+    1 'a' neq?
+  ] can
+] describe

@@ -166,7 +166,7 @@ func parseMatching(idx int, code string, op, cl uint8) (i int, s string) {
 			i++
 			f := ""
 			i, f = parseMatching(i, code, op, cl)
-			str += "[" + f + "]"
+			str += string(op) + f + string(cl)
 		} else if c == cl {
 			return i, strings.TrimSpace(str)
 		} else {

@@ -80,10 +80,12 @@ func main() {
 				)
 
 		} else {
+			contents := ""
 			for _, file := range os.Args[1:] {
-				contents, _ := ioutil.ReadFile(file)
-				interpreter.Eval(string(contents), stk, tbl)
+				content, _ := ioutil.ReadFile(file)
+				contents += string(content)
 			}
+			interpreter.Eval(contents, stk, tbl)
 		}
 
 	} else {

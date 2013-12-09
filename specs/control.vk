@@ -1,0 +1,69 @@
+'if-else' [
+  'call the first branch if true' [
+    true :false :true if-else
+  ] can
+
+  'call the second branch if false' [
+    false :true :false if-else
+  ] can
+] describe
+
+'call' [
+  'call the block at the top of the stack' [
+    [ 3 3 = ] call
+  ] can
+] describe
+
+'without' [
+  'call the second element' [
+    false :not 'blocking' without pop
+  ] can
+
+  'allow drop to ignore top element' [
+    1 2 3 :drop 4 without
+    size 1 =
+    swap 4 =
+    and
+  ] can
+] describe
+
+'without2' [
+  'call the second element' [
+    false :not 'this' 'that' without2
+    pop pop
+  ] can
+] describe
+
+'under' [
+  'call the top element while removing the second element' [
+    false 'blocking' :not under pop
+  ] can
+] describe
+
+'under2' [
+  'call the top element while removing the second and third elements' [
+    false 'this' 'that' :not under2
+    pop pop
+  ] can
+] describe
+
+'while' [
+  'perform a loop' [
+    5 :dec [ zero? ! ] while
+    0 =
+  ] can
+] describe
+
+'until' [
+  'perform a loop, with the inverse condition to while' [
+    5 :dec :zero? until
+    0 =
+  ] can
+] describe
+
+'times' [
+  'call a block multiple times' [
+    300 :inc 5 times
+    305 =
+  ] can
+] describe

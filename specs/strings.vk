@@ -1,0 +1,13 @@
+'concat' [
+  'join two strings' [
+    'Hello' ' World' concat
+    'Hello World' =
+  ] can
+] describe
+
+'join' [
+  'join a list of strings' [
+    ('a' 'b' 'c' 'd') '=' join
+    'a=b=c=d' =
+  ] can
+] describe

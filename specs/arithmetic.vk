@@ -1,0 +1,137 @@
+'add' [
+  'add two positive numbers' [
+    5 2 add 7 =
+  ] can
+
+  'add two negative numbers' [
+    -5 -2 add -7 =
+  ] can
+
+  'add a positive number to a negative number' [
+    -5 2 add -3 =
+  ] can
+
+  'add a negative number to a positive number' [
+    5 -2 add 3 =
+  ] can
+] describe
+
+'mult' [
+  'multiply two positive numbers' [
+    5 2 mult 10 =
+  ] can
+
+  'multiply two negative numbers' [
+    -5 -2 mult 10 =
+  ] can
+
+  'multiply a positive number and a negative number' [
+    -5 2 mult -10 =
+  ] can
+
+  'multiply a negative number and a positive number' [
+    5 -2 mult -10 =
+  ] can
+] describe
+
+'sub' [
+  'subtract two positive numbers' [
+    5 2 sub -3 =
+  ] can
+
+  'subtract two negative numbers' [
+    -5 -2 sub 3 =
+  ] can
+
+  'subtract a positive number from a negative number' [
+    5 -2 sub -7 =
+  ] can
+
+  'subtract a negative number from a positive number' [
+    -5 2 sub 7 =
+  ] can
+] describe
+
+'div' [
+  'divide two positive numbers' [
+    2 10 div 5 =
+  ] can
+
+  'divide two negative numbers' [
+    -2 -10 div 5 =
+  ] can
+
+  'divide a positive number by a negative number' [
+    -2 10 div -5 =
+  ] can
+
+  'divide a negaitve number by a positive number' [
+    2 -10 div -5 =
+  ] can
+] describe
+
+'neg' [
+  'negate a positive number' [
+    5 neg -5 =
+  ] can
+
+  'negate a negative number' [
+    -5 neg 5 =
+  ] can
+
+  'ignore zero' [
+    0 neg 0 =
+  ] can
+] describe
+
+'sum' [
+  'sum all values on the stack' [
+    1 2 3 4 sum 10 =
+  ] can
+] describe
+
+'prod' [
+  'multiply all values on the stack' [
+    1 2 3 4 prod 24 =
+  ] can
+] describe
+
+'inc' [
+  'increment a positive number' [  1 inc 2 = ] can
+  'increment a negative number' [ -1 inc 0 = ] can
+] describe
+
+'dec' [
+  'decrement a positive number' [  1 dec  0 = ] can
+  'decrement a negative number' [ -1 dec -2 = ] can
+] describe
+
+'zero?' [
+  'see zero is zero' [
+    0 zero?
+  ] can
+
+  'see a positive number is not zero' [
+    5 zero? not
+  ] can
+
+  'see a negative number is not zero' [
+    -5 zero? not
+  ] can
+] describe
+
+'abs' [
+  'ignore positive numbers' [
+    5 abs 5 =
+  ] can
+
+  'find the absolute value of negative numbers' [
+    -5 abs 5 =
+  ] can
+] describe
+
+'fact' [
+  'find the factorial of a positive number' [
+    5 fact 120 =
+  ] can
+] describe

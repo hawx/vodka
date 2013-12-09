@@ -1,0 +1,43 @@
+'string' [
+  'convert a string to a string' [
+    'hello' string 'hello' =
+  ] can
+
+  'convert an integer to a string' [
+    1 string "1" =
+  ] can
+
+  'convert a list to a string' [
+    (1 2 3) string "(1 2 3)" =
+  ] can
+] describe
+
+'integer' [
+  'convert a positive integer in a string' [
+    "12" integer 12 =
+  ] can
+
+  'convert a negative integer in a string' [
+    "-12" integer -12 =
+  ] can
+] describe
+
+'list' [
+  'convert a string to a one element list' [
+    "hello" list ("hello") =
+  ] can
+
+  'convert an integer to a one element list' [
+    12 list (12) =
+  ] can
+
+  'convert a list to a one element list' [
+    (123) list ((123)) =
+  ] can
+] describe
+
+'range' [
+  'create a list from the first value to the last' [
+    1 5 range (1 2 3 4 5) =
+  ] can
+] describe

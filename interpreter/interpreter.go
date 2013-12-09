@@ -70,13 +70,20 @@ func BootedTable(boot string) *table.Table {
 	})
 
 	tbl.Define("string", func(s *stack.Stack, t *table.Table) types.VType {
-		v := s.PopString()
-		s.Push(v)
+		v := s.Pop()
+
+		if v.Type() == "string" {
+			s.Push(v)
+		} else {
+			s.Push(vstring.New(v.String()))
+		}
+
 		return vnil.New()
 	})
 
 	tbl.Define("list", func(s *stack.Stack, t *table.Table) types.VType {
 		v := s.Pop()
+
 		list := make([]types.VType, 1)
 		list[0] = v
 
@@ -183,7 +190,7 @@ func BootedTable(boot string) *table.Table {
 	tbl.Define("sub", func(s *stack.Stack, t *table.Table) types.VType {
 		a := s.Pop().Value().(int)
 		b := s.Pop().Value().(int)
-		sub := vinteger.NewFromInt(b - a)
+		sub := vinteger.NewFromInt(a - b)
 		s.Push(sub)
 		return vnil.New()
 	})
@@ -191,7 +198,7 @@ func BootedTable(boot string) *table.Table {
 	tbl.Define("div", func(s *stack.Stack, t *table.Table) types.VType {
 		a := s.Pop().Value().(int)
 		b := s.Pop().Value().(int)
-		div := vinteger.NewFromInt(b / a)
+		div := vinteger.NewFromInt(a / b)
 		s.Push(div)
 		return vnil.New()
 	})
@@ -320,14 +327,22 @@ func BootedTable(boot string) *table.Table {
 	// Lists
 
 	tbl.Define("head", func(s *stack.Stack, t *table.Table) types.VType {
-		h := s.Pop().Value().([]types.VType)[0]
-		s.Push(h)
+		h := s.Pop().Value().([]types.VType)
+		if len(h) > 0 {
+			s.Push(h[0])
+		} else {
+			s.Push(vnil.New())
+		}
 		return vnil.New()
 	})
 
 	tbl.Define("tail", func(s *stack.Stack, t *table.Table) types.VType {
-		v := s.Pop().Value().([]types.VType)[1:]
-		s.Push(vlist.NewFromList(v))
+		v := s.Pop().Value().([]types.VType)
+		if len(v) > 0 {
+			s.Push(vlist.NewFromList(v[1:]))
+		} else {
+			s.Push(vnil.New())
+		}
 		return vnil.New()
 	})
 
@@ -427,7 +442,8 @@ func BootedTable(boot string) *table.Table {
 		block := s.Pop().Value().(*p.Tokens)
 		desc  := s.Pop().Value().(string)
 
-		ns, _, _ := run(block, s, t)
+		// IMPORTANT: run on an empty stack each time
+		ns, _, _ := run(block, stack.New(), t)
 		if ns.Pop().Value().(bool) {
 			fmt.Print(".")
 			specTbl[desc] = true

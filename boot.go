@@ -39,7 +39,7 @@ const BOOT string = `
 ; Checks whether the stack contains one or less elements.
 ; sig: -> bool
 'small?' [
-  size 1 lte?
+  2 size lte?
 ] define
 
 ; Checks whether the top element is nil.
@@ -113,7 +113,6 @@ const BOOT string = `
 ; example: 'lorem.txt' read ;=> ["Lorem ..."]
 'read' __document__
 
-
 ; group: Stack operations
 
 ; Removes the element from the top of the stack.
@@ -157,7 +156,7 @@ const BOOT string = `
 ; Calls the block on the top of the stack for each element on the stack,
 ; should be used with a reductive function.
 ; sig: 'A block -> 'a
-'stack' [ size 2 - times ] define
+'stack' [ 3 size - times ] define
 
 ; group: Arithmetic operations
 
@@ -210,7 +209,7 @@ const BOOT string = `
 
 ; Decrements the number at the top of the stack.
 ; sig: int -> int
-'dec' [ 1 sub ] define
+'dec' [ 1 swap sub ] define
 
 'inc' '++' alias
 'dec' '--' alias

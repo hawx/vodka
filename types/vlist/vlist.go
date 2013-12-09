@@ -36,7 +36,6 @@ func (v *VList) Type() string {
 // Compare returns 0 if the values are equal, -2 otherwise.
 func (v *VList) Compare(other types.VType) int {
 	val, same := other.(*VList)
-
 	if !same { return -2 }
 
 	if len(v.value) != len(val.value) {
