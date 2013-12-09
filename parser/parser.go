@@ -97,13 +97,22 @@ func FullParse(code string) *Tokens {
 
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			i, temp = parseUntilWhitespace(i, code)
-			list.AddToken("int", temp)
+			matcher, _ := regexp.Compile("([0-9]+)\\.\\.(-?[0-9]+)")
+
+			if matcher.MatchString(temp) {
+				list.AddToken("range", temp)
+			} else {
+				list.AddToken("int", temp)
+			}
 
 		case '-':
 			i, temp = parseUntilWhitespace(i, code)
-			matcher, _ := regexp.Compile("-[0-9]+")
+			number, _ := regexp.Compile("-[0-9]+")
+			ranger, _ := regexp.Compile("(-[0-9]+)\\.\\.(-?[0-9]+)")
 
-			if matcher.MatchString(temp) {
+			if ranger.MatchString(temp) {
+				list.AddToken("range", temp)
+			} else if number.MatchString(temp) {
 				list.AddToken("int", temp)
 			} else {
 				list.AddToken("fun", temp)

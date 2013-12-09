@@ -38,6 +38,6 @@
 
 'range' [
   'create a list from the first value to the last' [
-    1 5 range (1 2 3 4 5) =
+    5 1 range 1..5 =
   ] can
 ] describe

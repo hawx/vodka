@@ -17,3 +17,9 @@ type VType interface {
 	Compare(VType) int
 
 }
+
+type Rangeable interface {
+	Next() Rangeable
+	Prev() Rangeable
+	VType
+}

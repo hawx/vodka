@@ -231,7 +231,7 @@ const BOOT string = `
 ; sig: int -> int
 ; example: 5 fact ;=> [120]
 'fact' [
-  1 swap range :* reduce
+  1 swap range list :* reduce
 ] define
 
 

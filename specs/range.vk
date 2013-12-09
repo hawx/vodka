@@ -1,0 +1,35 @@
+'range' [
+  'create between positive integers' [
+    1..5 type 'range' =
+  ] can
+
+  'create between negative integers' [
+    -5..-1 type 'range' =
+  ] can
+] describe
+
+'list' [
+  'turn a range of positive integers into a list' [
+    1..5 list (1 2 3 4 5) =
+  ] can
+
+  'turn a range of negative integers into a list' [
+    -5..-1 list (-5 -4 -3 -2 -1) =
+  ] can
+
+  'turn a descending range of integers into a list' [
+    2..-2 list (2 1 0 -1 -2) =
+  ] can
+] describe
+
+'max' [
+  'find the maximum of a range' [
+    2..-2 max 2 =
+  ] can
+] describe
+
+'min' [
+  'find the minimum of a range' [
+    2..-2 min -2 =
+  ] can
+] describe

@@ -2,19 +2,20 @@ package interpreter
 
 import (
 	"fmt"
-	"io/ioutil"
 	p "github.com/hawx/vodka/parser"
+	"io/ioutil"
 
-	"github.com/hawx/vodka/table"
 	"github.com/hawx/vodka/stack"
+	"github.com/hawx/vodka/table"
 
 	"github.com/hawx/vodka/types"
 	"github.com/hawx/vodka/types/vblock"
 	"github.com/hawx/vodka/types/vboolean"
-	"github.com/hawx/vodka/types/vnil"
-	"github.com/hawx/vodka/types/vstring"
 	"github.com/hawx/vodka/types/vinteger"
 	"github.com/hawx/vodka/types/vlist"
+	"github.com/hawx/vodka/types/vnil"
+	"github.com/hawx/vodka/types/vrange"
+	"github.com/hawx/vodka/types/vstring"
 )
 
 // Special assign that will be executed before the interpreter exits.
@@ -84,23 +85,41 @@ func BootedTable(boot string) *table.Table {
 	tbl.Define("list", func(s *stack.Stack, t *table.Table) types.VType {
 		v := s.Pop()
 
-		list := make([]types.VType, 1)
-		list[0] = v
+		if r,ok := v.(*vrange.VRange); ok {
+			list := r.List()
+			s.Push(list)
 
-		s.Push(vlist.NewFromList(list))
+		} else {
+			list := make([]types.VType, 1)
+			list[0] = v
+
+			s.Push(vlist.NewFromList(list))
+		}
 
 		return vnil.New()
 	})
 
 	tbl.Define("range", func(s *stack.Stack, t *table.Table) types.VType {
-		end   := s.Pop().Value().(int)
-		start := s.Pop().Value().(int)
+		start := s.Pop().(types.Rangeable)
+		end := s.Pop().(types.Rangeable)
 
-		list := make([]types.VType, end - start + 1)
-		for i := start; i <= end; i++ {
-			list[i-start] = vinteger.NewFromInt(i)
-		}
-		s.Push(vlist.NewFromList(list))
+		s.Push(vrange.NewFromStartAndEnd(start, end))
+
+		return vnil.New()
+	})
+
+	tbl.Define("max", func(s *stack.Stack, t *table.Table) types.VType {
+		v := s.Pop().(*vrange.VRange)
+
+		s.Push(v.Max())
+
+		return vnil.New()
+	})
+
+	tbl.Define("min", func(s *stack.Stack, t *table.Table) types.VType {
+		v := s.Pop().(*vrange.VRange)
+
+		s.Push(v.Min())
 
 		return vnil.New()
 	})
@@ -360,13 +379,13 @@ func BootedTable(boot string) *table.Table {
 
 		// Ripped from http://golang.org/doc/effective_go.html#slices
 		l := len(a)
-		if l + len(b) > cap(a) {
+		if l+len(b) > cap(a) {
 			// Allocate double what's needed, for future growth.
-			newSlice := make([]types.VType, (l + len(b)) * 2)
+			newSlice := make([]types.VType, (l+len(b))*2)
 			copy(newSlice, a)
 			a = newSlice
 		}
-		a = a[0:l+len(b)]
+		a = a[0 : l+len(b)]
 		for i, c := range b {
 			a[l+i] = c
 		}
@@ -415,7 +434,7 @@ func BootedTable(boot string) *table.Table {
 
 	tbl.Define("describe", func(s *stack.Stack, t *table.Table) types.VType {
 		block := s.Pop().Value().(*p.Tokens)
-		desc  := s.Pop().Value().(string)
+		desc := s.Pop().Value().(string)
 
 		fmt.Print("\n" + desc + "\n  ")
 
@@ -424,7 +443,7 @@ func BootedTable(boot string) *table.Table {
 
 		fmt.Print("\n")
 
-		for v,k := range specTbl {
+		for v, k := range specTbl {
 			if k {
 				passCount++
 			} else {
@@ -440,7 +459,7 @@ func BootedTable(boot string) *table.Table {
 
 	tbl.Define("can", func(s *stack.Stack, t *table.Table) types.VType {
 		block := s.Pop().Value().(*p.Tokens)
-		desc  := s.Pop().Value().(string)
+		desc := s.Pop().Value().(string)
 
 		// IMPORTANT: run on an empty stack each time
 		ns, _, _ := run(block, stack.New(), t)
@@ -459,7 +478,6 @@ func BootedTable(boot string) *table.Table {
 
 	return tbl
 }
-
 
 func eval(code string, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *table.Table, types.VType) {
 	tokens := p.Parse(code)
@@ -495,6 +513,9 @@ func run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *t
 
 		case "int": // ints are pushed onto the stack as vintegers
 			stk.Push(vinteger.New(tok.Val))
+
+		case "range": // ranges are pushed onto the stack as vranges
+			stk.Push(vrange.New(tok.Val))
 
 		case "list": // lists are pushed onto the stack as vlists
 			sub := stack.New()

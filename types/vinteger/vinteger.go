@@ -26,6 +26,14 @@ func (v *VInteger) Type() string {
 	return "integer"
 }
 
+func (v *VInteger) Next() types.Rangeable {
+	return NewFromInt(v.value + 1)
+}
+
+func (v *VInteger) Prev() types.Rangeable {
+	return NewFromInt(v.value - 1)
+}
+
 // Compare returns 0 if the values are equal, -1 if the value given is less, and
 // 1 if the value given is greater.
 func (v *VInteger) Compare(other types.VType) int {
