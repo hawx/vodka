@@ -18,7 +18,7 @@ func (v *VRange) String() string {
 }
 
 func (v *VRange) Value() interface{} {
-	return []int{v.start.Value().(int), v.end.Value().(int)}
+	return v.List().Value()
 }
 
 func (v *VRange) Type() string {
