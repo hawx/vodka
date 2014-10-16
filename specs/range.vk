@@ -33,3 +33,19 @@
     2..-2 min -2 =
   ] can
 ] describe
+
+'head' [
+  'gets the first element of a range' [
+    2..-2 head  2 =
+    -2..2 head -2 =
+    and
+  ] can
+] describe
+
+'tail' [
+  'gets all elements of a range exluding the first' [
+    2..-2 tail ( 1 0 -1 -2) =
+    -2..2 tail (-1 0  1  2) =
+    and
+  ] can
+] describe
