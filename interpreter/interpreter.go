@@ -51,8 +51,13 @@ func BootedTable(boot string) *table.Table {
 	})
 
 	tbl.Define("defined", func(s *stack.Stack, t *table.Table) types.VType {
-		v := vstring.New(t.Defined())
-		s.Push(v)
+		defined := t.Defined()
+		list := make([]types.VType, len(defined))
+		for i, name := range defined {
+			list[i] = vstring.New(name)
+		}
+
+		s.Push(vlist.NewFromList(list))
 		return vnil.New()
 	})
 

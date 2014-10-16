@@ -5,6 +5,7 @@ import (
 	p "github.com/hawx/vodka/parser"
 	s "github.com/hawx/vodka/stack"
 	"github.com/hawx/vodka/types"
+	"sort"
 )
 
 type function func(*s.Stack, *Table) types.VType
@@ -39,17 +40,20 @@ func (t *Table) String() string {
 }
 
 // Defined returns a string of all function names joined by a single space.
-func (t *Table) Defined() string {
-	s := ""
-	for n, _ := range t.Native {
-		s += n + " "
+func (t *Table) Defined() []string {
+	s := []string{}
+
+	for name, _ := range t.Native {
+		s = append(s, name)
 	}
-	for n, _ := range t.Function {
-		s += n + " "
+	for name, _ := range t.Function {
+		s = append(s, name)
 	}
-	for n, _ := range t.Aliases {
-		s += n + " "
+	for name, _ := range t.Aliases {
+		s = append(s, name)
 	}
+
+	sort.Strings(s)
 	return s
 }
 
@@ -80,16 +84,9 @@ func (t *Table) Alias(from, to string) {
 
 // New returns a new, empty Table.
 func New() *Table {
-	tbl := new(Table)
-
-	n := map[string]p.Tokens{}
-	tbl.Native = n
-
-	f := map[string]Function{}
-	tbl.Function = f
-
-	a := map[string]string{}
-	tbl.Aliases = a
-
-	return tbl
+	return &Table{
+	  Native:   map[string]p.Tokens{},
+	  Function: map[string]Function{},
+	  Aliases:  map[string]string{},
+	}
 }
