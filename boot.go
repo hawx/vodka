@@ -362,22 +362,7 @@ const BOOT string = `
 ; condition at the top of the stack is true.
 ; sig: block (block -> bool) -> 'a
 ; example: 5 :dec [ zero? ! ] while ;=> [0]
-'while' [
-  ; Evaluate the condition, while leaving copies of everything
-  swapp swap dup
-  swapp swap dup
-  swapp call
-
-  ; If condition is false, cleanup
-  [ pop swap pop ]
-  ; If condition is still true, ...
-  [
-    swapp swap dup
-    swapp swap without2
-    while
-  ]
-  if-else
-] define
+'while' __document__
 
 ; Evaluates the second block while the condition at the top of the stack is
 ; false.
@@ -393,8 +378,8 @@ const BOOT string = `
 'times' [
   swap
   wrap :dec swap compose :under compose
-  :zero?
-  ; 300 5 [ dec :inc under ] :zero? until
+  [ dup zero? ]
+  ; 300 5 [ dec :inc under ] [ dup zero? ] until
   until
 
   ; Cleanup counter
@@ -461,4 +446,22 @@ const BOOT string = `
   wrap :stack compose apply head
 ] define
 
+; Applies the function to each element in the list.
+; sig: list block -> list
+'map' [
+  ()
+  swap swapp
+
+  [
+    [ dup head swap ] under
+    :tail under
+    dup
+    swapp
+    [ call cons ] under2
+  ] [
+    () swap swapp [ dup := under ] under swapp swap
+  ] until
+
+  pop pop
+] define
 `

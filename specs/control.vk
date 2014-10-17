@@ -48,15 +48,26 @@
 ] describe
 
 'while' [
-  'perform a loop' [
-    5 :dec [ zero? ! ] while
+  'perform an action on the top of the stack' [
+    1 2 3 4 5 :dec [ dup zero? ! ] while
     0 =
+    [ 4 = ] under and
+    [ 3 = ] under and
+    [ 2 = ] under and
+    [ 1 = ] under and
+  ] can
+
+  'perform an action on an empty stack' [
+    [ 1 ] [ size 3 > ] while
+    1 =
+    [ 1 = ] under and
+    [ 1 = ] under and
   ] can
 ] describe
 
 'until' [
   'perform a loop, with the inverse condition to while' [
-    5 :dec :zero? until
+    5 :dec [ dup zero? ] until
     0 =
   ] can
 ] describe

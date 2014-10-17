@@ -318,6 +318,28 @@ func BootedTable(boot string) *table.Table {
 		return vnil.New()
 	})
 
+	tbl.Define("while", func(s *stack.Stack, t *table.Table) types.VType {
+		pred := s.Pop()
+		action := s.Pop()
+
+		for {
+			tokens := &p.Tokens{}
+			*tokens = append(*tokens, p.Token{"fun", "call"})
+
+			s.Push(pred)
+			run(tokens, s, t)
+
+			if !s.Pop().Value().(bool) {
+				break
+			}
+
+			s.Push(action)
+			run(tokens, s, t)
+		}
+
+		return vnil.New()
+	})
+
 	tbl.Define("without", func(s *stack.Stack, t *table.Table) types.VType {
 		save := s.Pop()
 		tokens := new(p.Tokens)

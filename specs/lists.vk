@@ -61,3 +61,10 @@
     10 =
   ] can
 ] describe
+
+'map' [
+  'apply a block to each element in the list' [
+    (1 2 3 4) :inc map
+    (2 3 4 5) =
+  ] can
+] describe
