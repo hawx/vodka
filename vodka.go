@@ -10,6 +10,7 @@ import (
 	"github.com/hawx/vodka/interpreter"
 	"github.com/hawx/vodka/stack"
 	"github.com/hawx/vodka/types"
+	"github.com/hawx/vodka/table"
 	"github.com/hawx/vodka/types/vnil"
 	"github.com/hawx/vodka/doc"
 )
@@ -65,7 +66,7 @@ func isHelpFlag(s string) bool {
 
 func main() {
 	stk := stack.New()
-	tbl := interpreter.BootedTable(BOOT)
+	tbl := interpreter.BootedTable(table.BOOT)
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "doc" {

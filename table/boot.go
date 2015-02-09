@@ -1,4 +1,4 @@
-package main
+package table
 
 const BOOT string = `
 
