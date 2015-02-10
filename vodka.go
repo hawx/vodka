@@ -1,21 +1,68 @@
 package main
 
 import (
-	"strings"
-	"bufio"
-	"fmt"
-	"io/ioutil"
-	"os"
-
 	"github.com/hawx/vodka/interpreter"
 	"github.com/hawx/vodka/stack"
 	"github.com/hawx/vodka/types"
 	"github.com/hawx/vodka/table"
 	"github.com/hawx/vodka/types/vnil"
 	"github.com/hawx/vodka/doc"
+
+	// "github.com/nsf/termbox-go"
+
+	"strings"
+	"bufio"
+	"fmt"
+	"io/ioutil"
+	"os"
 )
 
-func toString(bytes []uint8) string {
+type Prompt struct {
+	cursor string
+	interp func(string) (string, string)
+	r      *bufio.Reader
+}
+
+func NewPrompt(cursor string, interp func(string) (string, string)) *Prompt {
+	return &Prompt{cursor, interp, bufio.NewReader(os.Stdin)}
+}
+
+func (p *Prompt) Loop() {
+	for {
+		line := p.promptLine()
+
+		if line == "quit" {
+			break
+		}
+
+		line = p.completeLine(line, "[", "]")
+		line = p.completePair(line, "'")
+		line = p.completePair(line, "\"")
+		line = p.completeLine(line, "(", ")")
+
+		stk, e := p.interp(line)
+		fmt.Printf("%s => %s\n", stk, e)
+	}
+}
+
+func (p *Prompt) promptLine() string {
+	fmt.Print(p.cursor)
+	l, _, _ := p.r.ReadLine()
+	return p.toString(l)
+}
+
+func (p *Prompt) continueLine(depth int) string {
+	s := ""
+	for i := 0; i < depth; i++ {
+		s += "  "
+	}
+
+	fmt.Print(".. " + s)
+	l, _, _ := p.r.ReadLine()
+	return p.toString(l)
+}
+
+func (p *Prompt) toString(bytes []uint8) string {
 	str := ""
 	for _, c := range bytes {
 		str += string(byte(c))
@@ -23,23 +70,12 @@ func toString(bytes []uint8) string {
 	return str
 }
 
-func promptLine(prompt string) string {
-	fmt.Print(prompt)
-	r := bufio.NewReader(os.Stdin)
-	l, _, _ := r.ReadLine()
-	return toString(l)
-}
-
-func completeLine(line, o, c string) string {
+func (p *Prompt) completeLine(line, o, c string) string {
 	opens  := strings.Count(line, o)
 	closes := strings.Count(line, c)
 
 	for opens != closes {
-		s := ""
-		for i := 0; i < (opens - closes); i++ {
-			s += "  "
-		}
-		line += "\n" + promptLine(".. " + s)
+		line += "\n" + p.continueLine(opens - closes)
 		opens  = strings.Count(line, o)
 		closes = strings.Count(line, c)
 	}
@@ -47,9 +83,9 @@ func completeLine(line, o, c string) string {
 	return line
 }
 
-func completePair(line, o string) string {
+func (p *Prompt) completePair(line, o string) string {
 	for strings.Count(line, o) % 2 != 0 {
-		line += "\n" + promptLine("..  ")
+		line += "\n" + p.continueLine(0)
 	}
 
 	return line
@@ -92,21 +128,13 @@ func main() {
 	} else {
 		fmt.Println("Vodka REPL, CTRL+C or type 'quit' to quit")
 
-		for {
-			line := promptLine(">> ")
-
-			if line == "quit" {
-				break
-			}
-
-			line = completeLine(line, "[", "]")
-			line = completePair(line, "'")
-			line = completePair(line, "\"")
-			line = completeLine(line, "(", ")")
-
+		interp := func(line string) (string, string) {
 			var e types.VType = vnil.New()
 			stk, tbl, e = interpreter.Eval(line, stk, tbl)
-			fmt.Printf("%s => %s\n", stk.TruncatedString(), e.String())
+			return stk.TruncatedString(), e.String()
 		}
+
+		prompt := NewPrompt(">> ", interp)
+		prompt.Loop()
 	}
 }
