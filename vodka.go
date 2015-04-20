@@ -1,20 +1,20 @@
 package main
 
 import (
-	"github.com/hawx/vodka/interpreter"
-	"github.com/hawx/vodka/stack"
-	"github.com/hawx/vodka/types"
-	"github.com/hawx/vodka/table"
-	"github.com/hawx/vodka/types/vnil"
-	"github.com/hawx/vodka/doc"
+	"hawx.me/code/vodka/doc"
+	"hawx.me/code/vodka/interpreter"
+	"hawx.me/code/vodka/stack"
+	"hawx.me/code/vodka/table"
+	"hawx.me/code/vodka/types"
+	"hawx.me/code/vodka/types/vnil"
 
 	// "github.com/nsf/termbox-go"
 
-	"strings"
 	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 type Prompt struct {
@@ -71,12 +71,12 @@ func (p *Prompt) toString(bytes []uint8) string {
 }
 
 func (p *Prompt) completeLine(line, o, c string) string {
-	opens  := strings.Count(line, o)
+	opens := strings.Count(line, o)
 	closes := strings.Count(line, c)
 
 	for opens != closes {
-		line += "\n" + p.continueLine(opens - closes)
-		opens  = strings.Count(line, o)
+		line += "\n" + p.continueLine(opens-closes)
+		opens = strings.Count(line, o)
 		closes = strings.Count(line, c)
 	}
 
@@ -84,7 +84,7 @@ func (p *Prompt) completeLine(line, o, c string) string {
 }
 
 func (p *Prompt) completePair(line, o string) string {
-	for strings.Count(line, o) % 2 != 0 {
+	for strings.Count(line, o)%2 != 0 {
 		line += "\n" + p.continueLine(0)
 	}
 
@@ -95,7 +95,9 @@ var HELP_FLAGS []string = []string{"help", "-h", "--help", "-?"}
 
 func isHelpFlag(s string) bool {
 	for _, flag := range HELP_FLAGS {
-		if flag == s { return true }
+		if flag == s {
+			return true
+		}
 	}
 	return false
 }
@@ -114,7 +116,7 @@ func main() {
 				"\n",
 				"  Given no files to run, vodka will launch into a REPL.\n",
 				"  Given a list of files, vodka will run each file in turn.\n",
-				)
+			)
 
 		} else {
 			contents := ""

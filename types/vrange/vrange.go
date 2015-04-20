@@ -2,10 +2,11 @@
 package vrange
 
 import (
-	"github.com/hawx/vodka/types"
-	"github.com/hawx/vodka/types/vinteger"
-	"github.com/hawx/vodka/types/vlist"
 	"strings"
+
+	"hawx.me/code/vodka/types"
+	"hawx.me/code/vodka/types/vinteger"
+	"hawx.me/code/vodka/types/vlist"
 )
 
 type VRange struct {

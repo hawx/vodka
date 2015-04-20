@@ -3,10 +3,10 @@ package stack
 
 import (
 	"fmt"
-	"github.com/hawx/vodka/types"
-	"github.com/hawx/vodka/types/vstring"
-)
 
+	"hawx.me/code/vodka/types"
+	"hawx.me/code/vodka/types/vstring"
+)
 
 type Stack []types.VType
 

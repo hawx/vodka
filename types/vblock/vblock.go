@@ -2,9 +2,10 @@
 package vblock
 
 import (
-	"github.com/hawx/vodka/types"
-	"github.com/hawx/vodka/parser"
 	"strings"
+
+	"hawx.me/code/vodka/parser"
+	"hawx.me/code/vodka/types"
 )
 
 // A block of vodka code, eg. `[mult]` or `:add`.

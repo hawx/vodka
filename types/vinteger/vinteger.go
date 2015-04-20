@@ -2,8 +2,9 @@
 package vinteger
 
 import (
-	"github.com/hawx/vodka/types"
 	"strconv"
+
+	"hawx.me/code/vodka/types"
 )
 
 // An integer, eg. `1`, `200`, etc.

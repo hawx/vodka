@@ -2,8 +2,8 @@
 package vlist
 
 import (
-	"github.com/hawx/vodka/types"
-	"github.com/hawx/vodka/stack"
+	"hawx.me/code/vodka/stack"
+	"hawx.me/code/vodka/types"
 )
 
 // A list type, eg. `(1 2 3)`.
@@ -36,7 +36,9 @@ func (v *VList) Type() string {
 // Compare returns 0 if the values are equal, -2 otherwise.
 func (v *VList) Compare(other types.VType) int {
 	val, same := other.(*VList)
-	if !same { return -2 }
+	if !same {
+		return -2
+	}
 
 	if len(v.value) != len(val.value) {
 		return -2

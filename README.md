@@ -7,11 +7,10 @@ and features a few syntax changes.
 
 ## Building
 
-To get up and running make sure you have Go 1 installed (`brew install go` with
-homebrew). You can then install it using `go install` like so,
+Install with `go get`,
 
 ``` bash
-$ go install github.com/hawx/vokda
+$ go get hawx.me/code/vokda
 ```
 
 Then to start a REPL simply run,

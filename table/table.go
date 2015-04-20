@@ -2,25 +2,26 @@
 package table
 
 import (
-	p "github.com/hawx/vodka/parser"
-	s "github.com/hawx/vodka/stack"
-	"github.com/hawx/vodka/types"
 	"sort"
+
+	p "hawx.me/code/vodka/parser"
+	s "hawx.me/code/vodka/stack"
+	"hawx.me/code/vodka/types"
 )
 
 type function func(*s.Stack, *Table) types.VType
 
 // A function takes the current stack, the table and returns a value.
 type Function struct {
-	Apply  function
+	Apply function
 }
 
 // A table consists of natively defined functions, ie. those defined in vodka
 // source code; functions defined in go code; and aliases.
 type Table struct {
-	Native    map[string]p.Tokens
-	Function  map[string]Function
-	Aliases   map[string]string
+	Native   map[string]p.Tokens
+	Function map[string]Function
+	Aliases  map[string]string
 }
 
 // String returns a formatted string displaying the names of all defined
@@ -85,8 +86,8 @@ func (t *Table) Alias(from, to string) {
 // New returns a new, empty Table.
 func New() *Table {
 	return &Table{
-	  Native:   map[string]p.Tokens{},
-	  Function: map[string]Function{},
-	  Aliases:  map[string]string{},
+		Native:   map[string]p.Tokens{},
+		Function: map[string]Function{},
+		Aliases:  map[string]string{},
 	}
 }

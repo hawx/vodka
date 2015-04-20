@@ -1,22 +1,23 @@
 package doc
 
 import (
-	"strings"
-	"regexp"
-	"io/ioutil"
-	"github.com/hoisie/mustache"
-	"sort"
-	"os"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"regexp"
+	"sort"
+	"strings"
 
-	"github.com/hawx/vodka/parser"
+	"github.com/hoisie/mustache"
+
+	"hawx.me/code/vodka/parser"
 )
 
 type FunctionDoc struct {
-	name  string
-	doc   string
-	src   string
-	grp   string
+	name string
+	doc  string
+	src  string
+	grp  string
 }
 
 func (f *FunctionDoc) String() string {
@@ -36,7 +37,7 @@ func (f *FunctionDoc) lines() []string {
 
 func (f *FunctionDoc) Meta(name string) string {
 	for _, line := range f.lines() {
-		if strings.HasPrefix(line, name + ":") {
+		if strings.HasPrefix(line, name+":") {
 			return strings.TrimSpace(line[len(name)+1:])
 		}
 	}
@@ -47,35 +48,34 @@ func (f *FunctionDoc) HasMeta(name string) bool {
 	return f.Meta(name) != ""
 }
 
-
 type FunctionData struct {
-	Name         string
-	Sig          string
-	Description  string
-	Example      interface{}
-	Source       interface{}
+	Name        string
+	Sig         string
+	Description string
+	Example     interface{}
+	Source      interface{}
 }
 
 func (f *FunctionDoc) Data() FunctionData {
 	r := new(FunctionData)
 
-	r.Name        = f.name
-	r.Sig         = strings.Replace(f.Meta("sig"), "->", "→", -1)
+	r.Name = f.name
+	r.Sig = strings.Replace(f.Meta("sig"), "->", "→", -1)
 	r.Description = f.String()
 	if f.HasMeta("example") {
-		r.Example   = f.Meta("example")
+		r.Example = f.Meta("example")
 	}
 	if f.src != "" {
-		r.Source    = f.src
+		r.Source = f.src
 	}
 
 	return *r
 }
 
 type GroupData struct {
-	Group      string
-	GroupID    string
-	Functions  *[]FunctionData
+	Group     string
+	GroupID   string
+	Functions *[]FunctionData
 }
 
 func NewGroupData(name string) GroupData {
@@ -117,13 +117,13 @@ func (g *GroupDatas) Add(val GroupData) {
 	*g = append(*g, val)
 }
 
-var thisDir string = os.Getenv("GOPATH") + "/src/github.com/hawx/vodka"
+var thisDir string = os.Getenv("GOPATH") + "/src/hawx.me/code/vodka"
 
 func ReadRsc(file string) string {
 	f, err := os.Open(thisDir + "/doc/rsc/" + file)
 
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not read '" + file + "'.")
+		fmt.Fprintln(os.Stderr, "Could not read '"+file+"'.")
 		os.Exit(1)
 	}
 
@@ -141,7 +141,7 @@ func Doc(input []string, output string) {
 	}
 
 	for _, file := range input {
-	  contents, _ := ioutil.ReadFile(file)
+		contents, _ := ioutil.ReadFile(file)
 		list := parser.FullParse(string(contents))
 		docs := split(*list)
 
@@ -168,7 +168,7 @@ func Doc(input []string, output string) {
 		sort.Sort(finalDatas)
 
 		data := map[string]interface{}{
-			"Title": "Docs",
+			"Title":  "Docs",
 			"Groups": finalDatas,
 			"Styles": ReadRsc("style.css"),
 			"Scripts": ReadRsc("jquery.min.js") +

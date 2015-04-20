@@ -1,7 +1,7 @@
 // Package vboolean implements the boolean type.
 package vboolean
 
-import "github.com/hawx/vodka/types"
+import "hawx.me/code/vodka/types"
 
 // A boolean value, either `true` or `false`.
 type VBoolean struct {

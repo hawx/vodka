@@ -2,20 +2,21 @@ package interpreter
 
 import (
 	"fmt"
-	p "github.com/hawx/vodka/parser"
 	"io/ioutil"
 
-	"github.com/hawx/vodka/stack"
-	"github.com/hawx/vodka/table"
+	p "hawx.me/code/vodka/parser"
 
-	"github.com/hawx/vodka/types"
-	"github.com/hawx/vodka/types/vblock"
-	"github.com/hawx/vodka/types/vboolean"
-	"github.com/hawx/vodka/types/vinteger"
-	"github.com/hawx/vodka/types/vlist"
-	"github.com/hawx/vodka/types/vnil"
-	"github.com/hawx/vodka/types/vrange"
-	"github.com/hawx/vodka/types/vstring"
+	"hawx.me/code/vodka/stack"
+	"hawx.me/code/vodka/table"
+
+	"hawx.me/code/vodka/types"
+	"hawx.me/code/vodka/types/vblock"
+	"hawx.me/code/vodka/types/vboolean"
+	"hawx.me/code/vodka/types/vinteger"
+	"hawx.me/code/vodka/types/vlist"
+	"hawx.me/code/vodka/types/vnil"
+	"hawx.me/code/vodka/types/vrange"
+	"hawx.me/code/vodka/types/vstring"
 )
 
 // Special assign that will be executed before the interpreter exits.
@@ -90,7 +91,7 @@ func BootedTable(boot string) *table.Table {
 	tbl.Define("list", func(s *stack.Stack, t *table.Table) types.VType {
 		v := s.Pop()
 
-		if r,ok := v.(*vrange.VRange); ok {
+		if r, ok := v.(*vrange.VRange); ok {
 			list := r.List()
 			s.Push(list)
 

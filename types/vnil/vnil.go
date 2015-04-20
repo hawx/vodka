@@ -1,7 +1,7 @@
 // Package vnil implements the nil type.
 package vnil
 
-import "github.com/hawx/vodka/types"
+import "hawx.me/code/vodka/types"
 
 // the nil value, `nil`.
 type VNil struct{}
