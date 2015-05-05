@@ -1,3 +1,13 @@
+'if' [
+  'call the branch if true' [
+    true 1 true [ pop ] if
+  ] can
+
+  'do nothing if false' [
+    true false [ 1 ] if
+  ] can
+] describe
+
 'if-else' [
   'call the first branch if true' [
     true :false :true if-else

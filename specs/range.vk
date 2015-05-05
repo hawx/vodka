@@ -43,7 +43,7 @@
 ] describe
 
 'tail' [
-  'gets all elements of a range exluding the first' [
+  'gets all elements of a range excluding the first' [
     2..-2 tail ( 1 0 -1 -2) =
     -2..2 tail (-1 0  1  2) =
     and

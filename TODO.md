@@ -1,20 +1,3 @@
-# Range
-
-A range should be creatable like in ruby, only have inclusive ranges to begin
-with, it's less confusing,
-
-    1..5
-
-with nice things like,
-
-    1..5 max   ;=> 5
-    1..5 min   ;=> 1
-
-    1..5 list  ;=> (1 2 3 4 5)
-
-    1 5 range  ;=> (1 2 3 4 5)
-
-
 # Dictionaries and Relations
 
 A relation looks like
