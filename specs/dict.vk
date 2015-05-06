@@ -1,0 +1,41 @@
+'relate' [
+  'create a dictionary' [
+    1 'a' relate {'a' 1} =
+  ] can
+] describe
+
+'relate-pairs' [
+  'create a dictionary' [
+    (1 2 3) ('a' 'b' 'c') relate-pairs {'a' 1 'b' 2 'c' 3} =
+  ] can
+] describe
+
+'get' [
+  'retrieve a value' [
+    {'a' 1 'b' 2 'c' 3} 'b' get 2 =
+  ] can
+
+  'return nil if key missing' [
+    {'a' 1} 'b' get nil?
+  ] can
+] describe
+
+'has?' [
+  'return true if key exists' [
+    {'a' 1} 'a' has?
+  ] can
+
+  'return false if key missing' [
+    {} 'a' has? !
+  ] can
+] describe
+
+'merge' [
+  'combine two dictionaries' [
+    {'a' 1} {'b' 2} merge {'a' 1 'b' 2} =
+  ] can
+
+  'overwrite values if keys collide' [
+    {'a' 1} {'a' 2} merge {'a' 2} =
+  ] can
+] describe

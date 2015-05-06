@@ -12,6 +12,7 @@ import (
 	"hawx.me/code/vodka/types"
 	"hawx.me/code/vodka/types/vblock"
 	"hawx.me/code/vodka/types/vboolean"
+	"hawx.me/code/vodka/types/vdict"
 	"hawx.me/code/vodka/types/vinteger"
 	"hawx.me/code/vodka/types/vlist"
 	"hawx.me/code/vodka/types/vnil"
@@ -454,6 +455,58 @@ func BootedTable(boot string) *table.Table {
 		return vnil.New()
 	})
 
+	// dictionaries
+
+	tbl.Define("relate", func(s *stack.Stack, t *table.Table) types.VType {
+		k := s.Pop()
+		v := s.Pop()
+
+		s.Push(vdict.NewFromMap(map[types.VType]types.VType{k: v}))
+
+		return vnil.New()
+	})
+
+	tbl.Define("relate-pairs", func(s *stack.Stack, t *table.Table) types.VType {
+		ks := s.Pop().Value().([]types.VType)
+		vs := s.Pop().Value().([]types.VType)
+
+		m := map[types.VType]types.VType{}
+		for i := range ks {
+			m[ks[i]] = vs[i]
+		}
+
+		s.Push(vdict.NewFromMap(m))
+
+		return vnil.New()
+	})
+
+	tbl.Define("get", func(s *stack.Stack, t *table.Table) types.VType {
+		k := s.Pop()
+		d := s.Pop().(*vdict.VDict)
+
+		s.Push(d.Get(k))
+
+		return vnil.New()
+	})
+
+	tbl.Define("has?", func(s *stack.Stack, t *table.Table) types.VType {
+		k := s.Pop()
+		d := s.Pop().(*vdict.VDict)
+
+		s.Push(d.Has(k))
+
+		return vnil.New()
+	})
+
+	tbl.Define("merge", func(s *stack.Stack, t *table.Table) types.VType {
+		a := s.Pop().(*vdict.VDict)
+		b := s.Pop().(*vdict.VDict)
+
+		s.Push(a.Merge(b))
+
+		return vnil.New()
+	})
+
 	// spec
 
 	var specTbl map[string]bool
@@ -552,6 +605,11 @@ func run(tokens *p.Tokens, stk *stack.Stack, tbl *table.Table) (*stack.Stack, *t
 
 		case "stm": // statements are pushed onto the stack as vblocks
 			stk.Push(vblock.New(tok.Val))
+
+		case "dict":
+			sub := stack.New()
+			sub, _, _ = eval(tok.Val, sub, tbl)
+			stk.Push(vdict.New(sub))
 
 		case "fun": // functions are called immediately
 			if tbl.Has(tok.Val) {

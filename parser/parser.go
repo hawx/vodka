@@ -8,8 +8,8 @@ package parser
 //         [fun: 5] [fun: times]]
 
 import (
-	"strings"
 	"regexp"
+	"strings"
 )
 
 type Tokens []Token
@@ -36,7 +36,6 @@ func (ts *Tokens) AddToken(key, val string) {
 	ts.Add(Token{key, val})
 }
 
-
 type Token struct {
 	Key string
 	Val string
@@ -45,7 +44,6 @@ type Token struct {
 func (t *Token) String() string {
 	return "[" + t.Key + ": " + t.Val + "]"
 }
-
 
 // FullParse implements the parser for vodka source code. It takes a string of
 // source code and returns the corresponding Tokens.
@@ -89,6 +87,11 @@ func FullParse(code string) *Tokens {
 			i++
 			i, temp = parseMatching(i, code, '[', ']')
 			list.AddToken("stm", temp)
+
+		case '{':
+			i++
+			i, temp = parseMatching(i, code, '{', '}')
+			list.AddToken("dict", temp)
 
 		case ':':
 			i++
@@ -141,7 +144,6 @@ func Parse(code string) *Tokens {
 
 	return list
 }
-
 
 func parseUntil(idx int, code string, until uint8) (i int, s string) {
 	return parseUntilAny(idx, code, []uint8{until})

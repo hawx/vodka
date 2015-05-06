@@ -1,32 +1,3 @@
-# Dictionaries and Relations
-
-A relation looks like
-
-    {'a' -> 1}
-
-A dictionary is just multiple relations, or a relation is a dictionary with one
-entry?
-
-    {'a' -> 1, 'b' -> 2}
-
-Commas are optional allowing
-
-    {
-      'a' -> 1
-      'b' -> 2
-      'c' -> 3
-    }
-
-Should be able to
-
-    {'a' -> 1} {'b' -> 2} merge          ;=> {'a' -> 1, 'b' -> 2}
-
-    1 'a' relate                         ;=> {'a' -> 1}
-    (1 2 3) ('a' 'b' 'c') relate-pairs   ;=> {'a' -> 1, 'b' -> 2, 'c' -> 3}
-
-    {'a' -> 1, 'b' -> 2} 'a' get         ;=> 1
-
-
 # Some kind of type system
 
 I don't really like type systems that much, but an optional type system could be
