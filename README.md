@@ -10,7 +10,7 @@ and features a few syntax changes.
 Install with `go get`,
 
 ``` bash
-$ go get hawx.me/code/vokda
+$ go get hawx.me/code/vodka
 ```
 
 Then to start a REPL simply run,
