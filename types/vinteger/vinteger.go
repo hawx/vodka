@@ -50,6 +50,10 @@ func (v *VInteger) Compare(other types.VType) int {
 	return -2
 }
 
+func (v *VInteger) Copy() types.VType {
+	return v
+}
+
 // New creates a new VInteger with the value parsed from the given string.
 func New(s string) *VInteger {
 	r := new(VInteger)

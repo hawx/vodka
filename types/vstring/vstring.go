@@ -38,6 +38,10 @@ func (v *VString) Compare(other types.VType) int {
 	return -2
 }
 
+func (v *VString) Copy() types.VType {
+	return v
+}
+
 // New creates a new VString with the value given.
 func New(s string) *VString {
 	r := new(VString)

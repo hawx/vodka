@@ -70,13 +70,17 @@ func (v *VRange) List() *vlist.VList {
 	return vlist.NewFromList(l)
 }
 
+func (v *VRange) Copy() types.VType {
+	return v
+}
+
 func New(s string) *VRange {
 	parts := strings.Split(s, "..")
 
-	r := new(VRange)
-	r.start = vinteger.New(parts[0])
-	r.end = vinteger.New(parts[1])
-	return r
+	return &VRange{
+		start: vinteger.New(parts[0]),
+		end:   vinteger.New(parts[1]),
+	}
 }
 
 func NewFromStartAndEnd(start, end types.Rangeable) *VRange {

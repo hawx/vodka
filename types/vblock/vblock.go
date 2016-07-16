@@ -44,9 +44,13 @@ func (v *VBlock) Compare(other types.VType) int {
 	return -2
 }
 
+func (v *VBlock) Copy() types.VType {
+	return v
+}
+
 // New creates a new VBlock with the string given.
 func New(s string) *VBlock {
-	r := new(VBlock)
-	r.value = strings.TrimSpace(s)
-	return r
+	return &VBlock{
+		value: strings.TrimSpace(s),
+	}
 }

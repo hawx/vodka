@@ -53,6 +53,12 @@ func (v *VList) Compare(other types.VType) int {
 	return 0
 }
 
+func (v *VList) Copy() types.VType {
+	dst := make([]types.VType, len(v.value))
+	copy(dst, v.value)
+	return NewFromList(dst)
+}
+
 // New creates a new list from the Stack given.
 func New(stk *stack.Stack) *VList {
 	r := new(VList)

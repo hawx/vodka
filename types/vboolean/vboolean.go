@@ -36,6 +36,10 @@ func (v VBoolean) Compare(other types.VType) int {
 	return -2
 }
 
+func (v *VBoolean) Copy() types.VType {
+	return v
+}
+
 // New creates a new VBoolean with the value given.
 func New(val bool) *VBoolean {
 	b := new(VBoolean)

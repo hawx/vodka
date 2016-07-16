@@ -96,6 +96,10 @@ func (v *VDict) Compare(other types.VType) int {
 	return 0
 }
 
+func (v *VDict) Copy() types.VType {
+	return v
+}
+
 func New(stk *stack.Stack) *VDict {
 	r := new(VDict)
 	r.keys = []types.VType{}

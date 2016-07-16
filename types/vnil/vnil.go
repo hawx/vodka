@@ -29,8 +29,11 @@ func (v *VNil) Compare(other types.VType) int {
 	return -2
 }
 
+func (v *VNil) Copy() types.VType {
+	return v
+}
+
 // New creates a new VNil
 func New() *VNil {
-	r := new(VNil)
-	return r
+	return &VNil{}
 }

@@ -167,7 +167,7 @@ func BootedTable(boot string) *table.Table {
 
 	tbl.Define("dup", func(s *stack.Stack, t *table.Table) types.VType {
 		v := s.Top()
-		s.Push(v)
+		s.Push(v.Copy())
 		return vnil.New()
 	})
 
