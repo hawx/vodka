@@ -104,6 +104,27 @@ languages.
 [25] => nil
 ```
 
+### Tests
+
+``` vodka
+'greet' [ 'Hello ' swap concat ] define
+
+'greet' [
+  'say hello' [
+    'World' greet 'Hellow World' eq?
+  ] can
+] describe
+```
+
+``` bash
+$ vodka greet.vk
+
+greet
+  .
+
+    1 pass / 0 fail
+```
+
 And we're done. So how about a slightly useful calculation showing some features
 off,
 

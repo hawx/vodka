@@ -27,31 +27,3 @@ Or even nicer
     ] multi-define
 
 And use type inference on the stack and functions to determine which to use.
-
-
-# VSpec
-
-Some kind of test framework.
-
-    '+' [
-      'add positive numbers' [
-        1 2 +
-        3 must-equal
-      ] can
-
-      'add negative numbers' [
-        -1 -2
-        -4 must-equal
-      ] can
-    ] describe
-
-    $ vodka adder_spec.vk
-
-    +
-    . add positive numbers
-    x add negative numbers
-
-    FAIL: 1 pass / 1 fail
-
-Then I can make sure vodka actually works against what I say it does... I should
-probably write go tests though.
